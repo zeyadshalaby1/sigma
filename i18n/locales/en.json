@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "title": "Sigma Petroleum Services | Leading Oil & Gas Solutions Provider",
+    "description": "Sigma Petroleum Services delivers cutting-edge digital and technological solutions for the oil, gas, and energy sectors. Trusted partner for drilling, well services, and petroleum consulting across the Middle East and Africa.",
+    "keywords": "petroleum services, oil and gas, drilling services, well services, energy solutions, petroleum consulting, sigma petroleum, oil field services, Middle East oil services"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero_title": "Sigma Petroleum Services",
+    "hero_subtitle": "Your trusted partner for cutting-edge petroleum and energy solutions across the Middle East and Africa",
+    "cta_button": "Get Started",
+    "learn_more": "Learn More"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "switch_to": "العربية",
+    "current": "English"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "built_with": "Built with"
+  },
+  "seo": {
+    "og_image_alt": "Sigma Petroleum Services - Leading Oil & Gas Solutions",
+    "schema_description": "Sigma Petroleum Services is a leading provider of oil and gas solutions, offering drilling services, well services, petroleum consulting, and advanced digital solutions for the energy sector across the Middle East and Africa.",
+    "schema_area_served": "Middle East, Africa, Egypt",
+    "schema_founding_year": "2020",
+    "schema_address_locality": "Cairo",
+    "schema_address_country": "Egypt"
+  }
+}

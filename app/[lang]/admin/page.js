@@ -33,7 +33,10 @@ import {
   MapPinned,
   NotebookPen,
   PlusCircle,
-  Eye
+  Eye,
+  Folder,
+  Image as ImageIcon,
+  ArrowLeftRight
 } from "lucide-react";
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar, Cell } from "recharts";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
@@ -41,6 +44,7 @@ import { BlogRichEditor } from "@/components/blog-rich-editor";
 import { useTheme } from "next-themes";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { defaultHomepageContent } from "@/lib/default-homepage";
 
 const FacebookIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg" fill="currentColor">
@@ -171,6 +175,20 @@ export default function AdminPage({ params }) {
     published: true,
   });
 
+  // Homepage Dynamic Editor State
+  const [homepageData, setHomepageData] = useState({ ar: null, en: null });
+  const [homepageLoading, setHomepageLoading] = useState(false);
+  const [homepageSaving, setHomepageSaving] = useState(false);
+  const [homepageLang, setHomepageLang] = useState("ar");
+  const [homepageForm, setHomepageForm] = useState(defaultHomepageContent.ar);
+
+  // Media Folder Browser State
+  const [mediaOpen, setMediaOpen] = useState(false);
+  const [mediaPath, setMediaPath] = useState("");
+  const [mediaItems, setMediaItems] = useState({ folders: [], files: [], currentPath: "", parentPath: "" });
+  const [mediaLoading, setMediaLoading] = useState(false);
+  const [imageSelectorKey, setImageSelectorKey] = useState("");
+
   // Check login on load
   useEffect(() => {
     const loggedInStatus = localStorage.getItem("admin_logged_in");
@@ -259,6 +277,168 @@ export default function AdminPage({ params }) {
 
     loadLegalPages();
   }, [isLoggedIn, activeTab]);
+
+  // Load Homepage Content
+  useEffect(() => {
+    if (!isLoggedIn || activeTab !== "homepage") return;
+
+    const loadHomepageData = async () => {
+      setHomepageLoading(true);
+      try {
+        const res = await fetch("/api/admin/homepage");
+        const data = await res.json();
+        if (data.success) {
+          const dbAr = data.ar || null;
+          const dbEn = data.en || null;
+          setHomepageData({ ar: dbAr, en: dbEn });
+          
+          // Set form fields for active editing language
+          const activeDbContent = homepageLang === "ar" ? dbAr : dbEn;
+          const fallback = defaultHomepageContent[homepageLang];
+          setHomepageForm(activeDbContent ? { ...fallback, ...activeDbContent } : fallback);
+        }
+      } catch (error) {
+        console.error("Failed to load homepage content", error);
+        toast.error(isRTL ? "فشل تحميل محتوى الصفحة الرئيسية" : "Failed to load homepage content");
+      } finally {
+        setHomepageLoading(false);
+      }
+    };
+
+    loadHomepageData();
+  }, [isLoggedIn, activeTab, homepageLang]);
+
+  // Load Media files when browser path changes
+  useEffect(() => {
+    if (!isLoggedIn || !mediaOpen) return;
+
+    const loadMediaItems = async () => {
+      setMediaLoading(true);
+      try {
+        const res = await fetch(`/api/admin/media?path=${encodeURIComponent(mediaPath)}`);
+        const data = await res.json();
+        if (data.success) {
+          setMediaItems(data);
+        } else {
+          toast.error(data.error || "Failed to load media files");
+        }
+      } catch (error) {
+        console.error("Failed to load media files", error);
+      } finally {
+        setMediaLoading(false);
+      }
+    };
+
+    loadMediaItems();
+  }, [isLoggedIn, mediaOpen, mediaPath]);
+
+  // Helper to update a top-level or simple field in homepageForm
+  const updateHomepageField = (key, value) => {
+    setHomepageForm(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  // Helper to update a nested list item in homepageForm (e.g. services, projects, stats)
+  const updateHomepageListItem = (listName, index, field, value) => {
+    setHomepageForm(prev => {
+      const listCopy = [...(prev[listName] || [])];
+      if (listCopy[index]) {
+        listCopy[index] = {
+          ...listCopy[index],
+          [field]: value
+        };
+      }
+      return {
+        ...prev,
+        [listName]: listCopy
+      };
+    });
+  };
+
+  // Helper to update a double-nested list item (like stats array inside project list items)
+  const updateProjectStatItem = (projectIndex, statIndex, field, value) => {
+    setHomepageForm(prev => {
+      const listCopy = [...(prev.projects_list || [])];
+      if (listCopy[projectIndex] && listCopy[projectIndex].stats) {
+        const statsCopy = [...listCopy[projectIndex].stats];
+        if (statsCopy[statIndex]) {
+          statsCopy[statIndex] = {
+            ...statsCopy[statIndex],
+            [field]: value
+          };
+        }
+        listCopy[projectIndex] = {
+          ...listCopy[projectIndex],
+          stats: statsCopy
+        };
+      }
+      return {
+        ...prev,
+        projects_list: listCopy
+      };
+    });
+  };
+
+  // Helper to save homepage content to Neon
+  const handleSaveHomepage = async (e) => {
+    if (e) e.preventDefault();
+    setHomepageSaving(true);
+    try {
+      const res = await fetch("/api/admin/homepage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lang: homepageLang,
+          content: homepageForm
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(isRTL ? "تم حفظ محتوى الصفحة الرئيسية بنجاح!" : "Homepage content saved successfully!");
+        // Update local cache
+        setHomepageData(prev => ({
+          ...prev,
+          [homepageLang]: data.content
+        }));
+      } else {
+        toast.error(data.error || "Failed to save homepage content");
+      }
+    } catch (error) {
+      console.error("Save homepage content error:", error);
+      toast.error(isRTL ? "فشل حفظ المحتوى" : "Failed to save content");
+    } finally {
+      setHomepageSaving(false);
+    }
+  };
+
+  // Trigger media selector modal
+  const openImageSelector = (pathKey) => {
+    setImageSelectorKey(pathKey);
+    setMediaPath(""); // reset to base Photos dir
+    setMediaOpen(true);
+  };
+
+  // Handle image selected from folder browser
+  const handleSelectMediaImage = (imageUrl) => {
+    // imageUrl is e.g. "/Sigma website/Photos/Early Production Facilities/4.png"
+    // We need to parse imageSelectorKey (e.g. "services.0.img" or "hero_video_bg")
+    const parts = imageSelectorKey.split(".");
+    
+    if (parts.length === 1) {
+      // Top level field
+      updateHomepageField(parts[0], imageUrl);
+    } else if (parts.length === 3) {
+      // Nested array (e.g. services.0.img or projects_list.1.img)
+      const [listName, indexStr, fieldName] = parts;
+      const index = parseInt(indexStr, 10);
+      updateHomepageListItem(listName, index, fieldName, imageUrl);
+    }
+    
+    setMediaOpen(false);
+    toast.success(isRTL ? "تم تحديد الصورة بنجاح!" : "Image selected successfully!");
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -748,6 +928,17 @@ export default function AdminPage({ params }) {
             >
               <NotebookPen className="h-4.5 w-4.5" />
               {t.blog}
+            </button>
+            <button
+              onClick={() => setActiveTab("homepage")}
+              className={`flex w-full items-center gap-3 rounded-xl px-4.5 py-3 text-xs md:text-sm font-extrabold transition-all cursor-pointer ${
+                activeTab === "homepage"
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "text-zinc-300 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <LayoutDashboard className="h-4.5 w-4.5" />
+              {lang === "ar" ? "الصفحة الرئيسية" : "Homepage"}
             </button>
             <button
               onClick={() => setActiveTab("social")}
@@ -1387,6 +1578,638 @@ export default function AdminPage({ params }) {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {activeTab === "homepage" && (
+            <div className="space-y-6">
+              {/* Homepage Editor Layout */}
+              <Card className="border-border/30 rounded-[28px] shadow-xl overflow-hidden bg-card">
+                <CardHeader className="pb-4 border-b border-border/10 px-6 pt-6 bg-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-base font-extrabold text-foreground">
+                      {isRTL ? "محرر الصفحة الرئيسية" : "Homepage Editor"}
+                    </CardTitle>
+                    <CardDescription className="text-xs font-medium mt-1">
+                      {isRTL 
+                        ? "قم بتعديل محتوى نصوص وصور كافة سكاشن الصفحة الرئيسية باللغتين العربية والإنجليزية." 
+                        : "Edit text and images for all homepage sections in Arabic and English."}
+                    </CardDescription>
+                  </div>
+
+                  {/* Actions Header: Lang selection & Save */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex rounded-xl bg-muted/50 p-1 border border-border/30">
+                      <button
+                        onClick={() => {
+                          setHomepageLang("ar");
+                          if (homepageData.ar) {
+                            setHomepageForm({ ...defaultHomepageContent.ar, ...homepageData.ar });
+                          } else {
+                            setHomepageForm(defaultHomepageContent.ar);
+                          }
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
+                          homepageLang === "ar" ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        العربية
+                      </button>
+                      <button
+                        onClick={() => {
+                          setHomepageLang("en");
+                          if (homepageData.en) {
+                            setHomepageForm({ ...defaultHomepageContent.en, ...homepageData.en });
+                          } else {
+                            setHomepageForm(defaultHomepageContent.en);
+                          }
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
+                          homepageLang === "en" ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        English
+                      </button>
+                    </div>
+
+                    <Button
+                      onClick={() => handleSaveHomepage()}
+                      disabled={homepageSaving}
+                      className="rounded-xl bg-[#E61C24] px-5 text-xs font-extrabold text-white hover:bg-[#E61C24]/90 h-9 cursor-pointer"
+                    >
+                      {homepageSaving ? (isRTL ? "جاري الحفظ..." : "Saving...") : (isRTL ? "حفظ التغييرات" : "Save Changes")}
+                    </Button>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="p-6 space-y-8">
+                  {homepageLoading ? (
+                    <div className="py-20 text-center text-xs font-extrabold text-muted-foreground">
+                      {isRTL ? "جاري تحميل محتوى الصفحة الرئيسية..." : "Loading homepage content..."}
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      
+                      {/* 1. Hero Section Form */}
+                      <div className="space-y-4 border-b border-border/10 pb-6">
+                        <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+                          1. {isRTL ? "قسم الهيرو والواجهة الرئيسية" : "Hero & Top Section"}
+                        </h4>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "شارة الهيرو العلوية" : "Hero Badge text"}</Label>
+                            <Input
+                              value={homepageForm?.hero_badge || ""}
+                              onChange={(e) => updateHomepageField("hero_badge", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان الهيرو الرئيسي" : "Hero Title"}</Label>
+                            <Input
+                              value={homepageForm?.hero_title || ""}
+                              onChange={(e) => updateHomepageField("hero_title", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "الوصف التعريفي للهيرو" : "Hero Subtitle"}</Label>
+                          <Input
+                            value={homepageForm?.hero_subtitle || ""}
+                            onChange={(e) => updateHomepageField("hero_subtitle", e.target.value)}
+                            className="rounded-xl text-xs"
+                          />
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-3">
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "زر الخدمات" : "CTA Services text"}</Label>
+                            <Input
+                              value={homepageForm?.cta_primary || ""}
+                              onChange={(e) => updateHomepageField("cta_primary", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "زر الفيديو" : "CTA Video text"}</Label>
+                            <Input
+                              value={homepageForm?.cta_watch_video || ""}
+                              onChange={(e) => updateHomepageField("cta_watch_video", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "زر ملف الشركة" : "CTA Profile text"}</Label>
+                            <Input
+                              value={homepageForm?.cta_profile || ""}
+                              onChange={(e) => updateHomepageField("cta_profile", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 2. Who We Are Section Form */}
+                      <div className="space-y-4 border-b border-border/10 pb-6">
+                        <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+                          2. {isRTL ? "قسم من نحن" : "Who We Are Section"}
+                        </h4>
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "شارة القسم" : "Section Badge"}</Label>
+                            <Input
+                              value={homepageForm?.who_we_are_title || ""}
+                              onChange={(e) => updateHomepageField("who_we_are_title", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الرئيسي للقسم" : "Section Subtitle"}</Label>
+                            <Input
+                              value={homepageForm?.who_we_are_subtitle || ""}
+                              onChange={(e) => updateHomepageField("who_we_are_subtitle", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "الفقرة الأولى" : "Paragraph 1"}</Label>
+                          <Input
+                            value={homepageForm?.who_we_are_text1 || ""}
+                            onChange={(e) => updateHomepageField("who_we_are_text1", e.target.value)}
+                            className="rounded-xl text-xs"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "الفقرة الثانية" : "Paragraph 2"}</Label>
+                          <Input
+                            value={homepageForm?.who_we_are_text2 || ""}
+                            onChange={(e) => updateHomepageField("who_we_are_text2", e.target.value)}
+                            className="rounded-xl text-xs"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "الفقرة الثالثة" : "Paragraph 3"}</Label>
+                          <Input
+                            value={homepageForm?.who_we_are_text3 || ""}
+                            onChange={(e) => updateHomepageField("who_we_are_text3", e.target.value)}
+                            className="rounded-xl text-xs"
+                          />
+                        </div>
+
+                        {/* Who We Are Stats */}
+                        <div className="grid gap-4 md:grid-cols-4 pt-2">
+                          <div className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-1.5">
+                            <span className="text-[10px] font-black text-primary">{isRTL ? "إحصائية التأسيس" : "Founded Stat"}</span>
+                            <Input
+                              value={homepageForm?.stat_founded_lbl || ""}
+                              onChange={(e) => updateHomepageField("stat_founded_lbl", e.target.value)}
+                              className="rounded-xl text-[10px] h-8 bg-card"
+                            />
+                            <Input
+                              value={homepageForm?.stat_founded_desc || ""}
+                              onChange={(e) => updateHomepageField("stat_founded_desc", e.target.value)}
+                              className="rounded-xl text-[10px] h-8 bg-card"
+                            />
+                          </div>
+                          <div className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-1.5">
+                            <span className="text-[10px] font-black text-primary">{isRTL ? "إحصائية المجموعة" : "Group Stat"}</span>
+                            <Input
+                              value={homepageForm?.stat_group_lbl || ""}
+                              onChange={(e) => updateHomepageField("stat_group_lbl", e.target.value)}
+                              className="rounded-xl text-[10px] h-8 bg-card"
+                            />
+                            <Input
+                              value={homepageForm?.stat_group_desc || ""}
+                              onChange={(e) => updateHomepageField("stat_group_desc", e.target.value)}
+                              className="rounded-xl text-[10px] h-8 bg-card"
+                            />
+                          </div>
+                          <div className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-1.5">
+                            <span className="text-[10px] font-black text-primary">{isRTL ? "إحصائية الدول" : "Countries Stat"}</span>
+                            <Input
+                              value={homepageForm?.stat_countries_lbl2 || ""}
+                              onChange={(e) => updateHomepageField("stat_countries_lbl2", e.target.value)}
+                              className="rounded-xl text-[10px] h-8 bg-card"
+                            />
+                            <Input
+                              value={homepageForm?.stat_countries_desc2 || ""}
+                              onChange={(e) => updateHomepageField("stat_countries_desc2", e.target.value)}
+                              className="rounded-xl text-[10px] h-8 bg-card"
+                            />
+                          </div>
+                          <div className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-1.5">
+                            <span className="text-[10px] font-black text-primary">{isRTL ? "إحصائية الشهادات" : "ISO Stat"}</span>
+                            <Input
+                              value={homepageForm?.stat_certified_lbl || ""}
+                              onChange={(e) => updateHomepageField("stat_certified_lbl", e.target.value)}
+                              className="rounded-xl text-[10px] h-8 bg-card"
+                            />
+                            <Input
+                              value={homepageForm?.stat_certified_desc || ""}
+                              onChange={(e) => updateHomepageField("stat_certified_desc", e.target.value)}
+                              className="rounded-xl text-[10px] h-8 bg-card"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 3. Services List Form */}
+                      <div className="space-y-4 border-b border-border/10 pb-6">
+                        <div>
+                          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+                            3. {isRTL ? "سكشن الخدمات والخبرات الفنية" : "Services & Technical Expertise"}
+                          </h4>
+                          <div className="grid gap-4 md:grid-cols-2 mt-3">
+                            <div className="space-y-1.5">
+                              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان السكشن" : "Services Title"}</Label>
+                              <Input
+                                value={homepageForm?.services_title || ""}
+                                onChange={(e) => updateHomepageField("services_title", e.target.value)}
+                                className="rounded-xl text-xs"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي للسكشن" : "Services Subtitle"}</Label>
+                              <Input
+                                value={homepageForm?.services_subtitle || ""}
+                                onChange={(e) => updateHomepageField("services_subtitle", e.target.value)}
+                                className="rounded-xl text-xs"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Iterate 9 services */}
+                        <div className="grid gap-6 md:grid-cols-3 pt-3">
+                          {(homepageForm?.services || []).map((srv, idx) => (
+                            <div key={idx} className="p-4 rounded-2xl bg-muted/40 border border-border/20 space-y-3">
+                              <span className="text-[10px] font-black text-[#003366] dark:text-primary tracking-wider uppercase block">
+                                {isRTL ? `خدمة ${idx + 1}` : `Service ${idx + 1}`}
+                              </span>
+                              <div className="space-y-1">
+                                <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "اسم الخدمة" : "Service Title"}</Label>
+                                <Input
+                                  value={srv.title || ""}
+                                  onChange={(e) => updateHomepageListItem("services", idx, "title", e.target.value)}
+                                  className="rounded-xl text-xs bg-card"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "الوصف" : "Service Description"}</Label>
+                                <Input
+                                  value={srv.desc || ""}
+                                  onChange={(e) => updateHomepageListItem("services", idx, "desc", e.target.value)}
+                                  className="rounded-xl text-xs bg-card"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "الصورة" : "Image URL"}</Label>
+                                <div className="flex gap-2">
+                                  <Input
+                                    value={srv.img || ""}
+                                    onChange={(e) => updateHomepageListItem("services", idx, "img", e.target.value)}
+                                    className="rounded-xl text-xs bg-card grow"
+                                  />
+                                  <Button
+                                    size="sm"
+                                    onClick={() => openImageSelector(`services.${idx}.img`)}
+                                    className="rounded-xl bg-primary text-white text-[10px] px-3 font-bold cursor-pointer h-9 shrink-0"
+                                  >
+                                    {isRTL ? "تصفح" : "Browse"}
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 4. Projects Section Form */}
+                      <div className="space-y-4 border-b border-border/10 pb-6">
+                        <div>
+                          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+                            4. {isRTL ? "سكشن المشاريع الكبرى" : "Projects Section"}
+                          </h4>
+                          <div className="grid gap-4 md:grid-cols-3 mt-3">
+                            <div className="space-y-1.5">
+                              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "شارة السكشن" : "Projects Badge"}</Label>
+                              <Input
+                                value={homepageForm?.projects_badge || ""}
+                                onChange={(e) => updateHomepageField("projects_badge", e.target.value)}
+                                className="rounded-xl text-xs"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان السكشن" : "Projects Title"}</Label>
+                              <Input
+                                value={homepageForm?.projects_title || ""}
+                                onChange={(e) => updateHomepageField("projects_title", e.target.value)}
+                                className="rounded-xl text-xs"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "وصف السكشن" : "Projects Description"}</Label>
+                              <Input
+                                value={homepageForm?.projects_desc || ""}
+                                onChange={(e) => updateHomepageField("projects_desc", e.target.value)}
+                                className="rounded-xl text-xs"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* List of 3 projects */}
+                        <div className="space-y-6 pt-2">
+                          {(homepageForm?.projects_list || []).map((proj, pIdx) => (
+                            <div key={pIdx} className="p-5 rounded-2xl bg-muted/40 border border-border/20 space-y-4">
+                              <span className="text-xs font-black text-primary uppercase block">
+                                {isRTL ? `مشروع ${pIdx + 1}` : `Project ${pIdx + 1}`}
+                              </span>
+                              <div className="grid gap-4 md:grid-cols-3">
+                                <div className="space-y-1">
+                                  <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "اسم المشروع" : "Project Title"}</Label>
+                                  <Input
+                                    value={proj.title || ""}
+                                    onChange={(e) => updateHomepageListItem("projects_list", pIdx, "title", e.target.value)}
+                                    className="rounded-xl text-xs bg-card"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي / العملاء" : "Subtitle / Operator"}</Label>
+                                  <Input
+                                    value={proj.subtitle || ""}
+                                    onChange={(e) => updateHomepageListItem("projects_list", pIdx, "subtitle", e.target.value)}
+                                    className="rounded-xl text-xs bg-card"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "الوصف الجذاب" : "Tagline"}</Label>
+                                  <Input
+                                    value={proj.tagline || ""}
+                                    onChange={(e) => updateHomepageListItem("projects_list", pIdx, "tagline", e.target.value)}
+                                    className="rounded-xl text-xs bg-card"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-1">
+                                  <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "الصورة" : "Image URL"}</Label>
+                                  <div className="flex gap-2">
+                                    <Input
+                                      value={proj.img || ""}
+                                      onChange={(e) => updateHomepageListItem("projects_list", pIdx, "img", e.target.value)}
+                                      className="rounded-xl text-xs bg-card grow"
+                                    />
+                                    <Button
+                                      size="sm"
+                                      onClick={() => openImageSelector(`projects_list.${pIdx}.img`)}
+                                      className="rounded-xl bg-primary text-white text-[10px] px-3 font-bold cursor-pointer h-9 shrink-0"
+                                    >
+                                      {isRTL ? "تصفح" : "Browse"}
+                                    </Button>
+                                  </div>
+                                </div>
+
+                                {/* Stats array for projects */}
+                                <div className="space-y-2">
+                                  <Label className="text-[10px] font-black text-muted-foreground block">{isRTL ? "الأرقام والإحصائيات" : "Project Stats (3 fields)"}</Label>
+                                  <div className="grid gap-2 grid-cols-3">
+                                    {(proj.stats || []).map((st, sIdx) => (
+                                      <div key={sIdx} className="p-2 rounded-xl bg-card border border-border/20 space-y-1 text-center">
+                                        <Input
+                                          value={st.num || ""}
+                                          onChange={(e) => updateProjectStatItem(pIdx, sIdx, "num", e.target.value)}
+                                          placeholder="180 / 3"
+                                          className="rounded-lg text-[9px] h-7 text-center bg-muted/20"
+                                        />
+                                        <Input
+                                          value={st.unit || ""}
+                                          onChange={(e) => updateProjectStatItem(pIdx, sIdx, "unit", e.target.value)}
+                                          placeholder="Month / MMSCFD"
+                                          className="rounded-lg text-[9px] h-7 text-center bg-muted/20"
+                                        />
+                                        <Input
+                                          value={st.label || ""}
+                                          onChange={(e) => updateProjectStatItem(pIdx, sIdx, "label", e.target.value)}
+                                          placeholder="Execution / Cap"
+                                          className="rounded-lg text-[9px] h-7 text-center bg-muted/20"
+                                        />
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 5. Values & Certifications Section Form */}
+                      <div className="space-y-4 pb-6">
+                        <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+                          5. {isRTL ? "القيم والشهادات العالمية" : "Values & Certifications Section"}
+                        </h4>
+                        
+                        <div className="grid gap-4 md:grid-cols-3">
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "شارة الشهادات" : "Certs Badge"}</Label>
+                            <Input
+                              value={homepageForm?.certs_badge || ""}
+                              onChange={(e) => updateHomepageField("certs_badge", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان قسم الشهادات" : "Certs Title"}</Label>
+                            <Input
+                              value={homepageForm?.certs_section_title || ""}
+                              onChange={(e) => updateHomepageField("certs_section_title", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "وصف قسم الشهادات" : "Certs Description"}</Label>
+                            <Input
+                              value={homepageForm?.certs_section_desc || ""}
+                              onChange={(e) => updateHomepageField("certs_section_desc", e.target.value)}
+                              className="rounded-xl text-xs"
+                            />
+                          </div>
+                        </div>
+
+                        {/* List of 3 certs details */}
+                        <div className="grid gap-4 md:grid-cols-3 pt-3">
+                          {(homepageForm?.certs_list_new || []).map((cert, idx) => (
+                            <div key={idx} className="p-4 rounded-2xl bg-muted/40 border border-border/20 space-y-2">
+                              <span className="text-[10px] font-black text-primary uppercase block">
+                                {cert.code}
+                              </span>
+                              <div className="space-y-1">
+                                <Label className="text-[9px] font-bold text-muted-foreground">{isRTL ? "العنوان" : "Title"}</Label>
+                                <Input
+                                  value={cert.title || ""}
+                                  onChange={(e) => updateHomepageListItem("certs_list_new", idx, "title", e.target.value)}
+                                  className="rounded-xl text-xs bg-card"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[9px] font-bold text-muted-foreground">{isRTL ? "الشرح" : "Description"}</Label>
+                                <Input
+                                  value={cert.desc || ""}
+                                  onChange={(e) => updateHomepageListItem("certs_list_new", idx, "desc", e.target.value)}
+                                  className="rounded-xl text-xs bg-card"
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* List of 4 values */}
+                        <div className="grid gap-4 md:grid-cols-4 pt-3">
+                          {(homepageForm?.values_list || []).map((val, idx) => (
+                            <div key={idx} className="p-4 rounded-2xl bg-muted/40 border border-border/20 space-y-2">
+                              <span className="text-[10px] font-black text-[#003366] dark:text-white uppercase block">
+                                {isRTL ? `القيمة ${idx + 1}` : `Value ${idx + 1}`}
+                              </span>
+                              <div className="space-y-1">
+                                <Label className="text-[9px] font-bold text-muted-foreground">{isRTL ? "عنوان القيمة" : "Value Title"}</Label>
+                                <Input
+                                  value={val.title || ""}
+                                  onChange={(e) => updateHomepageListItem("values_list", idx, "title", e.target.value)}
+                                  className="rounded-xl text-xs bg-card"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[9px] font-bold text-muted-foreground">{isRTL ? "شرح القيمة" : "Description"}</Label>
+                                <Input
+                                  value={val.desc || ""}
+                                  onChange={(e) => updateHomepageListItem("values_list", idx, "desc", e.target.value)}
+                                  className="rounded-xl text-xs bg-card"
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                      </div>
+
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Media Browser Modal Dialog */}
+          {mediaOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+              <div className="w-full max-w-4xl bg-card border border-border/30 rounded-[32px] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+                
+                {/* Modal Header */}
+                <div className="px-6 py-5 border-b border-border/10 bg-muted/20 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h3 className="text-base font-extrabold text-foreground flex items-center gap-2">
+                      <ImageIcon className="h-5 w-5 text-primary" />
+                      {isRTL ? "تصفح واختيار الصور" : "Select Image from Library"}
+                    </h3>
+                    <p className="text-[10px] text-muted-foreground font-semibold flex items-center gap-1.5">
+                      <span>/public/Sigma website/Photos</span>
+                      {mediaPath && <span>/ {mediaPath}</span>}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setMediaOpen(false)}
+                    className="rounded-xl hover:bg-muted font-bold text-xs"
+                  >
+                    {isRTL ? "إلغاء" : "Close"}
+                  </Button>
+                </div>
+
+                {/* Modal Content / Browser Grid */}
+                <div className="p-6 overflow-y-auto grow bg-background/50 space-y-6">
+                  {mediaLoading ? (
+                    <div className="py-24 text-center text-xs font-extrabold text-muted-foreground">
+                      {isRTL ? "جاري قراءة المجلدات والصور..." : "Reading folders & image assets..."}
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      
+                      {/* Parent directory link if in subfolder */}
+                      {mediaItems.parentPath !== null && (
+                        <button
+                          onClick={() => setMediaPath(mediaItems.parentPath)}
+                          className="flex items-center gap-2 text-xs font-bold text-primary hover:underline cursor-pointer bg-primary/10 border border-primary/20 px-4 py-2 rounded-xl"
+                        >
+                          <Folder className="h-4 w-4 shrink-0" />
+                          <span>.. {isRTL ? "المجلد السابق" : "Parent Directory"}</span>
+                        </button>
+                      )}
+
+                      {/* Folder Grid */}
+                      {mediaItems.folders.length > 0 && (
+                        <div className="space-y-2">
+                          <h5 className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                            {isRTL ? "المجلدات الفرعية" : "Folders"}
+                          </h5>
+                          <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+                            {mediaItems.folders.map((folder) => (
+                              <button
+                                key={folder.name}
+                                onClick={() => setMediaPath(folder.relativePath)}
+                                className="flex items-center gap-2.5 p-3 rounded-2xl border border-border/30 bg-card hover:border-primary/30 hover:bg-primary/5 transition-all text-start cursor-pointer group shadow-sm"
+                              >
+                                <Folder className="h-5 w-5 text-yellow-500 fill-yellow-500/10 group-hover:scale-105 transition" />
+                                <span className="text-xs font-extrabold text-foreground truncate">{folder.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Images Grid */}
+                      <div className="space-y-2">
+                        <h5 className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                          {isRTL ? "الصور المتاحة" : "Images"}
+                        </h5>
+                        {mediaItems.files.length > 0 ? (
+                          <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                            {mediaItems.files.map((file) => (
+                              <div
+                                key={file.name}
+                                onClick={() => handleSelectMediaImage(file.url)}
+                                className="rounded-2xl border border-border/30 bg-card hover:border-primary overflow-hidden cursor-pointer group transition-all hover:shadow-md hover:-translate-y-0.5 flex flex-col h-44 shadow-sm"
+                              >
+                                <div className="h-28 bg-muted/40 relative flex items-center justify-center p-2 border-b border-border/10 overflow-hidden">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={file.url}
+                                    alt={file.name}
+                                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300"
+                                  />
+                                </div>
+                                <div className="p-2 grow flex items-center">
+                                  <span className="text-[9px] font-bold text-foreground truncate block w-full text-center">
+                                    {file.name}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="py-12 border border-dashed border-border/40 rounded-2xl text-center text-xs font-bold text-muted-foreground bg-muted/5">
+                            {isRTL ? "لا توجد صور في هذا المجلد." : "No images found in this folder."}
+                          </div>
+                        )}
+                      </div>
+
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
 
           {activeTab === "legal" && (

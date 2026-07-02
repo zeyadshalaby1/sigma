@@ -1226,23 +1226,24 @@ export default function Home({ params }) {
               </div>
 
               {/* Real MENA Map */}
-              <div className="relative overflow-hidden rounded-[32px] border border-border/30 bg-muted/10 dark:bg-white/[0.02] w-full h-[380px] md:h-[440px] shadow-inner">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,51,102,0.04),transparent_70%)] pointer-events-none" />
+              <div className="relative overflow-hidden rounded-[32px] border border-border/30 bg-[#f0f4f8] dark:bg-[#0a1628] w-full h-[380px] md:h-[440px] shadow-inner">
                 <MenaMap
                   selectedCountry={selectedCountry}
                   onSelectCountry={setSelectedCountry}
                   isRTL={isRTL}
                 />
                 {/* Legend overlay */}
-                <div className="absolute bottom-4 end-4 bg-background/90 backdrop-blur-md px-4 py-2 rounded-full border border-border/30 text-[9px] font-black text-muted-foreground flex items-center gap-3 select-none pointer-events-none shadow-sm">
+                <div className="absolute bottom-4 end-4 bg-background/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-border/30 text-[9px] font-black text-muted-foreground flex items-center gap-4 select-none pointer-events-none shadow-sm">
                   <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#003366] dark:bg-[#4A90D9]" />
+                    <span className="w-2.5 h-2.5 rounded-sm bg-[#003366]" />
                     {isRTL ? "فروع سيجما" : "Sigma Offices"}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#E61C24]" />
+                    <span className="w-2.5 h-2.5 rounded-sm bg-[#E61C24]" />
                     {isRTL ? "الدولة المحددة" : "Selected"}
                   </span>
+                  <span className="text-muted-foreground/50">|</span>
+                  <span>{isRTL ? "اضغط على الدولة · سكرول للتكبير" : "Click Country · Scroll to Zoom"}</span>
                 </div>
               </div>
             </div>

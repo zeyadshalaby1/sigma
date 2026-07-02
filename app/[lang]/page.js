@@ -547,7 +547,7 @@ export default function Home({ params }) {
     <div className="min-h-screen bg-background text-foreground overflow-hidden font-sans">
       
       {/* 1. HERO SECTION WITH VIDEO BACKGROUND */}
-      <section className="relative pt-24 pb-28 md:py-36 flex flex-col items-center justify-center text-center px-6 min-h-[90vh] overflow-hidden border-b border-border/10">
+      <section className="relative isolate pt-24 pb-28 md:py-36 flex flex-col items-center justify-center text-center px-6 min-h-[90vh] overflow-hidden border-b border-border/10">
         
         {/* Background Video */}
         <video

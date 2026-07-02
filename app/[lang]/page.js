@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import MenaMap from "@/components/mena-map";
 
 const HERO_PARTICLES = Array.from({ length: 20 }).map((_, i) => ({
   id: i,
@@ -1204,7 +1205,7 @@ export default function Home({ params }) {
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
             
-            {/* Interactive Vector Map Grid (3/5 Columns) */}
+            {/* Interactive Real MENA Map (3/5 Columns) */}
             <div className="lg:col-span-3 space-y-4">
               <div className="p-4 rounded-2xl bg-card border border-border/30 flex items-center justify-between shadow-sm">
                 <span className="text-xs font-extrabold text-[#003366] dark:text-white">
@@ -1224,50 +1225,24 @@ export default function Home({ params }) {
                 </div>
               </div>
 
-              {/* Map Outer Box */}
-              <div className="relative overflow-hidden rounded-[32px] border border-border/30 bg-muted/20 w-full h-[380px] md:h-[440px] flex items-center justify-center cursor-grab active:cursor-grabbing shadow-inner">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,51,102,0.05),transparent_70%)] pointer-events-none" />
-                
-                {/* Draggable Map Box */}
-                <motion.div
-                  drag
-                  dragConstraints={{ left: -180, right: 180, top: -120, bottom: 120 }}
-                  className="absolute w-[500px] h-[350px] select-none"
-                  initial={{ scale: 1 }}
-                  whileHover={{ scale: 1.01 }}
-                >
-                  {/* Abstract SVG MENA & Africa Vector Outlines */}
-                  <svg viewBox="0 0 500 350" className="w-full h-full opacity-25 dark:opacity-15 text-muted-foreground fill-current">
-                    <path d="M40 100 Q 80 70, 130 80 T 190 110 T 240 120 T 290 100 T 340 70 T 390 90 T 450 140 T 480 180 L 440 320 L 350 330 L 290 280 L 240 240 L 160 250 L 90 200 L 30 150 Z" className="fill-[#003366] dark:fill-white stroke-[#003366]/40 dark:stroke-white/40 stroke-2" />
-                    <path d="M280 60 Q 310 40, 340 50 T 360 70 Z" className="fill-[#003366] dark:fill-white opacity-40" />
-                  </svg>
-
-                  {/* Interactive pins positioning */}
-                  {MAP_COUNTRIES.map((c) => (
-                    <button
-                      key={c.name}
-                      onClick={() => setSelectedCountry(c.name)}
-                      style={{ left: c.x, top: c.y }}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center cursor-pointer group z-20"
-                    >
-                      {/* Pulse effect */}
-                      <span className={`relative flex h-9 w-9 items-center justify-center rounded-full border shadow-md transition-all duration-300 ${selectedCountry === c.name ? "bg-primary border-primary scale-125 text-white" : "bg-card border-border hover:border-primary text-foreground"}`}>
-                        <span className="text-base select-none">{c.flag}</span>
-                        {selectedCountry === c.name && (
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/40 opacity-75" />
-                        )}
-                      </span>
-                      <span className={`text-[9px] font-black mt-1 px-1.5 py-0.5 rounded-md shadow border backdrop-blur-md whitespace-nowrap transition-all duration-200 ${selectedCountry === c.name ? "bg-primary text-white border-primary" : "bg-card/90 text-muted-foreground border-border/20"}`}>
-                        {isRTL ? c.nameAr : c.name}
-                      </span>
-                    </button>
-                  ))}
-                </motion.div>
-                
-                {/* Drag and Pan Instruction Controls Overlay */}
-                <div className="absolute bottom-4 end-4 bg-background/90 backdrop-blur-md px-4 py-2 rounded-full border border-border/30 text-[9px] font-black text-muted-foreground flex items-center gap-1.5 select-none pointer-events-none shadow-sm">
-                  <Globe className="h-3.5 w-3.5 animate-spin text-primary shrink-0" />
-                  <span>{isRTL ? "اسحب لتحريك الخريطة · انقر لتحديد دولة" : "Drag Map to Pan · Click Flag Pins"}</span>
+              {/* Real MENA Map */}
+              <div className="relative overflow-hidden rounded-[32px] border border-border/30 bg-muted/10 dark:bg-white/[0.02] w-full h-[380px] md:h-[440px] shadow-inner">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,51,102,0.04),transparent_70%)] pointer-events-none" />
+                <MenaMap
+                  selectedCountry={selectedCountry}
+                  onSelectCountry={setSelectedCountry}
+                  isRTL={isRTL}
+                />
+                {/* Legend overlay */}
+                <div className="absolute bottom-4 end-4 bg-background/90 backdrop-blur-md px-4 py-2 rounded-full border border-border/30 text-[9px] font-black text-muted-foreground flex items-center gap-3 select-none pointer-events-none shadow-sm">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#003366] dark:bg-[#4A90D9]" />
+                    {isRTL ? "فروع سيجما" : "Sigma Offices"}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#E61C24]" />
+                    {isRTL ? "الدولة المحددة" : "Selected"}
+                  </span>
                 </div>
               </div>
             </div>

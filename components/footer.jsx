@@ -56,7 +56,7 @@ export function Footer({ dict, socialLinks }) {
 
       <div className="container mx-auto max-w-5xl px-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-white/10">
-          
+
           {/* Logo & About Column */}
           <div className="flex flex-col items-center md:items-start space-y-5 text-center md:text-start">
             <div className="h-10 flex items-center transition-transform hover:scale-102">
@@ -153,8 +153,8 @@ export function Footer({ dict, socialLinks }) {
                 <div className="p-1.5 rounded-full bg-white/5 text-primary">
                   <Mail className="h-3.5 w-3.5" />
                 </div>
-                <a href="mailto:info@sigmapetroleum.com" className="hover:text-white transition-colors">
-                  info@sigmapetroleum.com
+                <a href="mailto:conact@sigmapetroleum.com" className="hover:text-white transition-colors">
+                  conact@sigmapetroleum.com
                 </a>
               </li>
               <li className="flex items-center justify-center md:justify-start gap-3">
@@ -164,63 +164,13 @@ export function Footer({ dict, socialLinks }) {
                 <span className="hover:text-white transition-colors">{isAr ? "القاهرة، مصر" : "Cairo, Egypt"}</span>
               </li>
             </ul>
-            <div className="flex items-center gap-3 pt-2">
-              {[
-                {
-                  name: "Facebook",
-                  url: socialLinks?.facebook ,
-                  Icon: FacebookIcon,
-                },
-                {
-                  name: "Instagram",
-                  url: socialLinks?.instagram,
-                  Icon: InstagramIcon,
-                },
-                {
-                  name: "YouTube",
-                  url: socialLinks?.youtube,
-                  Icon: YoutubeIcon,
-                },
-                {
-                  name: "LinkedIn",
-                  url: socialLinks?.linkedin,
-                  Icon: LinkedinIcon,
-                },
-                {
-                  name: "Twitter",
-                  url: socialLinks?.twitter,
-                  Icon: TwitterIcon,
-                },
-                {
-                  name: "WhatsApp",
-                  url: socialLinks?.whatsapp,
-                  Icon: WhatsAppIcon,
-                },
-              ]
-                .filter((item) => item.url)
-                .map((item) => {
-                  const Icon = item.Icon;
-                  return (
-                    <a
-                      key={item.name}
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={item.name}
-                      className="p-2.5 rounded-full bg-white/5 hover:bg-primary transition-all duration-300 text-white shadow-sm hover:scale-110 active:scale-95"
-                    >
-                      <Icon className="h-4 w-4" />
-                    </a>
-                  );
-                })}
-            </div>
           </div>
 
         </div>
 
         {/* Bottom Section */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-center md:text-start gap-4 text-[11px] text-zinc-500 font-semibold">
-          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 w-full justify-center">
             <div>
               © {new Date().getFullYear()} Sigma. {dict?.footer?.rights || (isAr ? "جميع الحقوق محفوظة" : "All rights reserved")}.
             </div>
@@ -238,15 +188,6 @@ export function Footer({ dict, socialLinks }) {
                 {isAr ? "الصحة والسلامة والبيئة (HSSE)" : "HSSE Policy"}
               </a>
             </div>
-          </div>
-          
-          {/* Developer Credit */}
-          <div className="text-[10px] text-zinc-500 flex items-center justify-center gap-1.5 bg-white/[0.02] border border-white/5 hover:border-primary/20 px-3 py-1.5 rounded-full transition-all duration-300">
-            <span>{isAr ? "تصميم وتطوير" : "Designed & Developed by"}</span>
-            <span className="font-bold text-zinc-300 flex items-center gap-0.5">
-              زياد شلبي (Zeyad Shalaby)
-              <Heart className="h-2.5 w-2.5 fill-primary text-primary animate-pulse" />
-            </span>
           </div>
         </div>
       </div>

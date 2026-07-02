@@ -223,7 +223,7 @@ function LocalBusinessSchema({ dict, baseUrl }) {
     image: `${baseUrl}/Sigma website/Sigma Logo/Orignal Logo.png`,
     url: baseUrl,
     telephone: "+20-123-456-7890",
-    email: "info@sigmapetroleum.com",
+    email: "conact@sigmapetroleum.com",
     address: {
       "@type": "PostalAddress",
       addressLocality: dict.seo?.schema_address_locality || "Cairo",

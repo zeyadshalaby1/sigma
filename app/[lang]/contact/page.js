@@ -95,7 +95,7 @@ export default function ContactPage({ params }) {
       {/* Main Content */}
       <div className="container mx-auto max-w-5xl px-6 py-16 md:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
-          
+
           {/* Contact Details Column (2/5 size) */}
           <div className="lg:col-span-2 space-y-6">
             <Card className="border-border/30 shadow-xl overflow-hidden rounded-[28px] bg-card">
@@ -105,7 +105,7 @@ export default function ContactPage({ params }) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-6 text-sm">
-                
+
                 {/* Address */}
                 <div className="flex gap-3">
                   <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-sm shrink-0 h-fit">
@@ -135,8 +135,8 @@ export default function ContactPage({ params }) {
                   </div>
                   <div className="space-y-1">
                     <span className="block font-extrabold text-foreground text-xs md:text-sm">{content.emailLabelField}</span>
-                    <a href="mailto:info@sigmapetroleum.com" className="block text-muted-foreground hover:text-primary transition-colors font-medium text-xs md:text-sm">
-                      info@sigmapetroleum.com
+                    <a href="mailto:conact@sigmapetroleum.com" className="block text-muted-foreground hover:text-primary transition-colors font-medium text-xs md:text-sm">
+                      conact@sigmapetroleum.com
                     </a>
                   </div>
                 </div>

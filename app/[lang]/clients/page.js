@@ -4,13 +4,28 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Handshake, Award, ShieldAlert, BadgeCheck } from "lucide-react";
 import { useParams } from "next/navigation";
+import { mergeContent } from "@/lib/merge-content";
+import { useState, useEffect } from "react";
 
 export default function ClientsPage() {
   const params = useParams();
   const lang = params.lang;
   const isRTL = lang === "ar";
 
-  const content = {
+  const [dbContent, setDbContent] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/admin/page-content?key=clients`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data[lang]) {
+          setDbContent(data[lang]);
+        }
+      })
+      .catch((err) => console.error("Error loading clients page content:", err));
+  }, [lang]);
+
+  const fallbackContent = {
     ar: {
       title: "شركاء النجاح والعملاء",
       subtitle: "نفخر بشراكتنا مع رواد الطاقة والمشغلين الدوليين والشركات الوطنية عبر الشرق الأوسط وأفريقيا.",
@@ -54,6 +69,8 @@ export default function ClientsPage() {
       ]
     }
   }[lang] || { ar: {}, en: {} };
+
+  const content = mergeContent(fallbackContent, dbContent);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">

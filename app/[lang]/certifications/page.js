@@ -4,13 +4,28 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, ShieldCheck, Flame, Scale, Lightbulb, Compass, Award, Clock } from "lucide-react";
 import { useParams } from "next/navigation";
+import { mergeContent } from "@/lib/merge-content";
+import { useState, useEffect } from "react";
 
 export default function CertificationsPage() {
   const params = useParams();
   const lang = params.lang;
   const isRTL = lang === "ar";
 
-  const content = {
+  const [dbContent, setDbContent] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/admin/page-content?key=certifications`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data[lang]) {
+          setDbContent(data[lang]);
+        }
+      })
+      .catch((err) => console.error("Error loading certifications page content:", err));
+  }, [lang]);
+
+  const fallbackContent = {
     ar: {
       title: "شهاداتنا وقيمنا",
       subtitle: "الجودة ليست مجرد وعد، بل هي الأساس الذي نبني عليه نجاح عملائنا وعملياتنا.",
@@ -112,6 +127,8 @@ export default function CertificationsPage() {
       ]
     }
   }[lang] || { ar: {}, en: {} };
+
+  const content = mergeContent(fallbackContent, dbContent);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">

@@ -8,11 +8,26 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, Send, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
+import { mergeContent } from "@/lib/merge-content";
+import { useEffect } from "react";
 
 export default function ContactPage() {
   const params = useParams();
   const lang = params.lang;
   const isRTL = lang === "ar";
+
+  const [dbContent, setDbContent] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/admin/page-content?key=contact`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data[lang]) {
+          setDbContent(data[lang]);
+        }
+      })
+      .catch((err) => console.error("Error loading contact page content:", err));
+  }, [lang]);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,7 +35,7 @@ export default function ContactPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const content = {
+  const fallbackContent = {
     ar: {
       title: "تواصل معنا",
       subtitle: "نحن هنا لمساعدتك. تواصل معنا لمناقشة أهدافك التشغيلية وتوريد احتياجات حقولك.",
@@ -62,6 +77,8 @@ export default function ContactPage() {
       successMsg: "Your message has been sent successfully! We will contact you soon."
     }
   }[lang] || { ar: {}, en: {} };
+
+  const content = mergeContent(fallbackContent, dbContent);
 
   const handleSubmit = (e) => {
     e.preventDefault();

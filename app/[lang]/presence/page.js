@@ -1,16 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Phone, Building2, Globe } from "lucide-react";
 import { useParams } from "next/navigation";
+import { mergeContent } from "@/lib/merge-content";
 
 export default function GlobalPresencePage() {
   const params = useParams();
   const lang = params.lang;
   const isRTL = lang === "ar";
 
-  const content = {
+  const [dbContent, setDbContent] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/admin/page-content?key=presence`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data[lang]) {
+          setDbContent(data[lang]);
+        }
+      })
+      .catch((err) => console.error("Error loading presence page content:", err));
+  }, [lang]);
+
+  const fallbackContent = {
     ar: {
       title: "تكامل وتواجد عالمي",
       subtitle: "تواجد تشغيلي قوي عبر الشرق الأوسط وأفريقيا لدعم قطاع الطاقة المتنامي.",
@@ -106,6 +120,8 @@ export default function GlobalPresencePage() {
       countries: ["Egypt", "Saudi Arabia", "Oman", "Libya", "Syria"]
     }
   }[lang] || { ar: {}, en: {} };
+
+  const content = mergeContent(fallbackContent, dbContent);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">

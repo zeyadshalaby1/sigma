@@ -1,16 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Shield, FastForward, Award, Layers, Sparkles, Handshake, Users, ArrowUpRight } from "lucide-react";
 import { useParams } from "next/navigation";
+import { mergeContent } from "@/lib/merge-content";
 
 export default function AboutPage() {
   const params = useParams();
   const lang = params.lang;
   const isRTL = lang === "ar";
 
-  const content = {
+  const [dbContent, setDbContent] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/admin/page-content?key=about`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data[lang]) {
+          setDbContent(data[lang]);
+        }
+      })
+      .catch((err) => console.error("Error loading about page content:", err));
+  }, [lang]);
+
+  const fallbackContent = {
     ar: {
       title: "من نحن",
       subtitle: "سيجما للخدمات البترولية - إرث من التميز والابتكار في قطاع النفط والغاز.",
@@ -52,6 +66,8 @@ export default function AboutPage() {
       ]
     }
   }[lang] || { ar: {}, en: {} };
+
+  const content = mergeContent(fallbackContent, dbContent);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">

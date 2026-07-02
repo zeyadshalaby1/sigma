@@ -45,6 +45,7 @@ import { useTheme } from "next-themes";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import { defaultHomepageContent } from "@/lib/default-homepage";
+import { defaultPagesContent } from "@/lib/default-pages";
 
 const FacebookIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg" fill="currentColor">
@@ -278,14 +279,21 @@ export default function AdminPage() {
     loadLegalPages();
   }, [isLoggedIn, activeTab]);
 
-  // Load Homepage Content
+  const [editingPageKey, setEditingPageKey] = useState("homepage");
+
+  // Load Page Content
   useEffect(() => {
     if (!isLoggedIn || activeTab !== "homepage") return;
 
-    const loadHomepageData = async () => {
+    const loadPageData = async () => {
       setHomepageLoading(true);
       try {
-        const res = await fetch("/api/admin/homepage");
+        let res;
+        if (editingPageKey === "homepage") {
+          res = await fetch("/api/admin/homepage");
+        } else {
+          res = await fetch(`/api/admin/page-content?key=${editingPageKey}`);
+        }
         const data = await res.json();
         if (data.success) {
           const dbAr = data.ar || null;
@@ -294,19 +302,21 @@ export default function AdminPage() {
           
           // Set form fields for active editing language
           const activeDbContent = homepageLang === "ar" ? dbAr : dbEn;
-          const fallback = defaultHomepageContent[homepageLang];
+          const fallback = editingPageKey === "homepage" 
+            ? defaultHomepageContent[homepageLang] 
+            : defaultPagesContent[editingPageKey][homepageLang];
           setHomepageForm(activeDbContent ? { ...fallback, ...activeDbContent } : fallback);
         }
       } catch (error) {
-        console.error("Failed to load homepage content", error);
-        toast.error(isRTL ? "فشل تحميل محتوى الصفحة الرئيسية" : "Failed to load homepage content");
+        console.error(`Failed to load ${editingPageKey} content`, error);
+        toast.error(isRTL ? "فشل تحميل محتوى الصفحة" : "Failed to load page content");
       } finally {
         setHomepageLoading(false);
       }
     };
 
-    loadHomepageData();
-  }, [isLoggedIn, activeTab, homepageLang]);
+    loadPageData();
+  }, [isLoggedIn, activeTab, homepageLang, editingPageKey]);
 
   // Load Media files when browser path changes
   useEffect(() => {
@@ -381,36 +391,115 @@ export default function AdminPage() {
     });
   };
 
-  // Helper to save homepage content to Neon
+  // Helper to save page content to Neon
   const handleSaveHomepage = async (e) => {
     if (e) e.preventDefault();
     setHomepageSaving(true);
     try {
-      const res = await fetch("/api/admin/homepage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lang: homepageLang,
-          content: homepageForm
-        })
-      });
+      let res;
+      if (editingPageKey === "homepage") {
+        res = await fetch("/api/admin/homepage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lang: homepageLang,
+            content: homepageForm
+          })
+        });
+      } else {
+        res = await fetch("/api/admin/page-content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            key: editingPageKey,
+            lang: homepageLang,
+            content: homepageForm
+          })
+        });
+      }
       const data = await res.json();
       if (data.success) {
-        toast.success(isRTL ? "تم حفظ محتوى الصفحة الرئيسية بنجاح!" : "Homepage content saved successfully!");
+        toast.success(isRTL ? "تم حفظ محتوى الصفحة بنجاح!" : "Page content saved successfully!");
         // Update local cache
         setHomepageData(prev => ({
           ...prev,
           [homepageLang]: data.content
         }));
       } else {
-        toast.error(data.error || "Failed to save homepage content");
+        toast.error(data.error || "Failed to save page content");
       }
     } catch (error) {
-      console.error("Save homepage content error:", error);
+      console.error("Save page content error:", error);
       toast.error(isRTL ? "فشل حفظ المحتوى" : "Failed to save content");
     } finally {
       setHomepageSaving(false);
     }
+  };
+
+  const updateServiceDetailsField = (serviceIndex, field, value) => {
+    setHomepageForm(prev => {
+      const listCopy = [...(prev.services || [])];
+      if (listCopy[serviceIndex]) {
+        listCopy[serviceIndex] = {
+          ...listCopy[serviceIndex],
+          details: {
+            ...(listCopy[serviceIndex].details || {}),
+            [field]: value
+          }
+        };
+      }
+      return {
+        ...prev,
+        services: listCopy
+      };
+    });
+  };
+
+  const updateServiceStatItem = (serviceIndex, statIndex, field, value) => {
+    setHomepageForm(prev => {
+      const listCopy = [...(prev.services || [])];
+      if (listCopy[serviceIndex] && listCopy[serviceIndex].details && listCopy[serviceIndex].details.stats) {
+        const statsCopy = [...listCopy[serviceIndex].details.stats];
+        if (statsCopy[statIndex]) {
+          statsCopy[statIndex] = {
+            ...statsCopy[statIndex],
+            [field]: value
+          };
+        }
+        listCopy[serviceIndex] = {
+          ...listCopy[serviceIndex],
+          details: {
+            ...listCopy[serviceIndex].details,
+            stats: statsCopy
+          }
+        };
+      }
+      return {
+        ...prev,
+        services: listCopy
+      };
+    });
+  };
+
+  const updateServiceBenefitItem = (serviceIndex, benefitIndex, value) => {
+    setHomepageForm(prev => {
+      const listCopy = [...(prev.services || [])];
+      if (listCopy[serviceIndex] && listCopy[serviceIndex].details && listCopy[serviceIndex].details.benefits) {
+        const benefitsCopy = [...listCopy[serviceIndex].details.benefits];
+        benefitsCopy[benefitIndex] = value;
+        listCopy[serviceIndex] = {
+          ...listCopy[serviceIndex],
+          details: {
+            ...listCopy[serviceIndex].details,
+            benefits: benefitsCopy
+          }
+        };
+      }
+      return {
+        ...prev,
+        services: listCopy
+      };
+    });
   };
 
   // Trigger media selector modal
@@ -893,6 +982,853 @@ export default function AdminPage() {
       </div>
     );
   }
+
+  const renderAboutPageEditor = () => {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "محتوى الصفحة الرئيسي" : "Page Header Content"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الرئيسي" : "Main Title"}</Label>
+              <Input
+                value={homepageForm?.title || ""}
+                onChange={(e) => updateHomepageField("title", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي" : "Subtitle"}</Label>
+              <Input
+                value={homepageForm?.subtitle || ""}
+                onChange={(e) => updateHomepageField("subtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان قسم من نحن" : "Identity Title"}</Label>
+            <Input
+              value={homepageForm?.whoWeAreTitle || ""}
+              onChange={(e) => updateHomepageField("whoWeAreTitle", e.target.value)}
+              className="rounded-xl text-xs"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "فقرة الهوية الأولى" : "Identity Paragraph 1"}</Label>
+            <textarea
+              value={homepageForm?.whoWeAreText1 || ""}
+              onChange={(e) => updateHomepageField("whoWeAreText1", e.target.value)}
+              rows={3}
+              className="w-full rounded-xl border border-border/30 bg-background/80 p-3 text-xs"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "فقرة الهوية الثانية" : "Identity Paragraph 2"}</Label>
+            <textarea
+              value={homepageForm?.whoWeAreText2 || ""}
+              onChange={(e) => updateHomepageField("whoWeAreText2", e.target.value)}
+              rows={3}
+              className="w-full rounded-xl border border-border/30 bg-background/80 p-3 text-xs"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "فقرة الاقتباس الثالثة" : "Quote Paragraph 3"}</Label>
+            <textarea
+              value={homepageForm?.whoWeAreText3 || ""}
+              onChange={(e) => updateHomepageField("whoWeAreText3", e.target.value)}
+              rows={3}
+              className="w-full rounded-xl border border-border/30 bg-background/80 p-3 text-xs"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "قسم الميزات والقدرات" : "Capabilities Grid Section"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان الميزات الرئيسي" : "Capabilities Title"}</Label>
+              <Input
+                value={homepageForm?.whyTitle || ""}
+                onChange={(e) => updateHomepageField("whyTitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي للميزات" : "Capabilities Subtitle"}</Label>
+              <Input
+                value={homepageForm?.whySubtitle || ""}
+                onChange={(e) => updateHomepageField("whySubtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 pt-2">
+            {(homepageForm?.features || []).map((feat, idx) => (
+              <div key={idx} className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-2">
+                <span className="text-[10px] font-black text-primary">{isRTL ? `ميزة ${idx + 1}` : `Feature ${idx + 1}`}</span>
+                <Input
+                  value={feat.title || ""}
+                  onChange={(e) => updateHomepageListItem("features", idx, "title", e.target.value)}
+                  placeholder={isRTL ? "اسم الميزة" : "Feature Title"}
+                  className="rounded-xl text-xs bg-card"
+                />
+                <Input
+                  value={feat.desc || ""}
+                  onChange={(e) => updateHomepageListItem("features", idx, "desc", e.target.value)}
+                  placeholder={isRTL ? "وصف الميزة" : "Feature Description"}
+                  className="rounded-xl text-xs bg-card"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderPresencePageEditor = () => {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "محتوى الصفحة الرئيسي" : "Page Header Content"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الرئيسي" : "Main Title"}</Label>
+              <Input
+                value={homepageForm?.title || ""}
+                onChange={(e) => updateHomepageField("title", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي" : "Subtitle"}</Label>
+              <Input
+                value={homepageForm?.subtitle || ""}
+                onChange={(e) => updateHomepageField("subtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان المانشيت" : "Headline"}</Label>
+              <Input
+                value={homepageForm?.headline || ""}
+                onChange={(e) => updateHomepageField("headline", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العناوين الفرعية للمكاتب" : "Offices Header Title"}</Label>
+              <Input
+                value={homepageForm?.officesTitle || ""}
+                onChange={(e) => updateHomepageField("officesTitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "وصف القسم" : "Description text"}</Label>
+            <textarea
+              value={homepageForm?.desc || ""}
+              onChange={(e) => updateHomepageField("desc", e.target.value)}
+              rows={3}
+              className="w-full rounded-xl border border-border/30 bg-background/80 p-3 text-xs"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "الفروع والمكاتب الإقليمية" : "Corporate & Regional Offices"}
+          </h4>
+          <div className="grid gap-6 md:grid-cols-2 pt-2">
+            {(homepageForm?.offices || []).map((office, idx) => (
+              <div key={idx} className="p-4 rounded-xl bg-muted/40 border border-border/30 space-y-2">
+                <span className="text-[10px] font-black text-primary">{isRTL ? `مكتب / فرع ${idx + 1}` : `Office / Branch ${idx + 1}`}</span>
+                <div className="space-y-1.5">
+                  <Label className="text-[9px] font-bold text-muted-foreground">{isRTL ? "الاسم" : "Name"}</Label>
+                  <Input
+                    value={office.name || ""}
+                    onChange={(e) => updateHomepageListItem("offices", idx, "name", e.target.value)}
+                    className="rounded-xl text-xs bg-card"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[9px] font-bold text-muted-foreground">{isRTL ? "العنوان" : "Address"}</Label>
+                  <Input
+                    value={office.address || ""}
+                    onChange={(e) => updateHomepageListItem("offices", idx, "address", e.target.value)}
+                    className="rounded-xl text-xs bg-card"
+                  />
+                </div>
+                <div className="grid gap-2 grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] font-bold text-muted-foreground">{isRTL ? "الهاتف" : "Phone"}</Label>
+                    <Input
+                      value={office.phone || ""}
+                      onChange={(e) => updateHomepageListItem("offices", idx, "phone", e.target.value)}
+                      className="rounded-xl text-xs bg-card"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] font-bold text-muted-foreground">{isRTL ? "نوع المكتب" : "Type"}</Label>
+                    <Input
+                      value={office.type || ""}
+                      onChange={(e) => updateHomepageListItem("offices", idx, "type", e.target.value)}
+                      className="rounded-xl text-xs bg-card"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderTimelinePageEditor = () => {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "محتوى الصفحة الرئيسي" : "Page Header Content"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الرئيسي" : "Main Title"}</Label>
+              <Input
+                value={homepageForm?.title || ""}
+                onChange={(e) => updateHomepageField("title", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي" : "Subtitle"}</Label>
+              <Input
+                value={homepageForm?.subtitle || ""}
+                onChange={(e) => updateHomepageField("subtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الجانبي للتايم لاين" : "Timeline Header Title"}</Label>
+              <Input
+                value={homepageForm?.timelineTitle || ""}
+                onChange={(e) => updateHomepageField("timelineTitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "الوصف الجانبي للتايم لاين" : "Timeline Header Subtitle"}</Label>
+              <Input
+                value={homepageForm?.timelineSubtitle || ""}
+                onChange={(e) => updateHomepageField("timelineSubtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "المحطات التاريخية والنمو" : "Timeline Milestone Events"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2 pt-2">
+            {(homepageForm?.events || []).map((event, idx) => (
+              <div key={idx} className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black text-primary">{isRTL ? `محطة ${idx + 1}` : `Event ${idx + 1}`}</span>
+                  <Input
+                    value={event.year || ""}
+                    onChange={(e) => updateHomepageListItem("events", idx, "year", e.target.value)}
+                    placeholder="2001"
+                    className="w-20 rounded-xl text-center text-xs h-7 bg-card font-extrabold"
+                  />
+                </div>
+                <Input
+                  value={event.title || ""}
+                  onChange={(e) => updateHomepageListItem("events", idx, "title", e.target.value)}
+                  placeholder={isRTL ? "عنوان الحدث" : "Event Title"}
+                  className="rounded-xl text-xs bg-card"
+                />
+                <textarea
+                  value={event.desc || ""}
+                  onChange={(e) => updateHomepageListItem("events", idx, "desc", e.target.value)}
+                  placeholder={isRTL ? "وصف الحدث" : "Event Description"}
+                  rows={2}
+                  className="w-full rounded-xl border border-border/30 bg-background/80 p-2 text-xs"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderServicesPageEditor = () => {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "محتوى الصفحة الرئيسي" : "Page Header Content"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الرئيسي" : "Main Title"}</Label>
+              <Input
+                value={homepageForm?.title || ""}
+                onChange={(e) => updateHomepageField("title", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي" : "Subtitle"}</Label>
+              <Input
+                value={homepageForm?.subtitle || ""}
+                onChange={(e) => updateHomepageField("subtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "قائمة الخدمات والخبرات الفنية (9 خدمات)" : "Services Details (9 Services)"}
+          </h4>
+          <div className="space-y-6">
+            {(homepageForm?.services || []).map((srv, idx) => (
+              <div key={idx} className="p-5 rounded-2xl bg-muted/40 border border-border/30 space-y-4">
+                <span className="text-xs font-black text-primary uppercase block">
+                  {isRTL ? `خدمة ${idx + 1}` : `Service ${idx + 1}`}
+                </span>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "العنوان القصير" : "Title"}</Label>
+                    <Input
+                      value={srv.title || ""}
+                      onChange={(e) => updateHomepageListItem("services", idx, "title", e.target.value)}
+                      className="rounded-xl text-xs bg-card"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "الوصف المختصر" : "Summary"}</Label>
+                    <Input
+                      value={srv.desc || ""}
+                      onChange={(e) => updateHomepageListItem("services", idx, "desc", e.target.value)}
+                      className="rounded-xl text-xs bg-card"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "العنوان الداخلي للخدمة" : "Details Headline"}</Label>
+                    <Input
+                      value={srv.details?.headline || ""}
+                      onChange={(e) => updateServiceDetailsField(idx, "headline", e.target.value)}
+                      className="rounded-xl text-xs bg-card"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "رابط الصورة" : "Image URL"}</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={srv.img || ""}
+                        onChange={(e) => updateHomepageListItem("services", idx, "img", e.target.value)}
+                        className="rounded-xl text-xs bg-card grow"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => openImageSelector(`services.${idx}.img`)}
+                        className="rounded-xl bg-primary text-white text-[10px] px-3 font-bold cursor-pointer h-9 shrink-0"
+                      >
+                        {isRTL ? "تصفح" : "Browse"}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-bold text-muted-foreground">{isRTL ? "شرح الخدمة المفصل" : "Detailed Content"}</Label>
+                  <textarea
+                    value={srv.details?.content1 || ""}
+                    onChange={(e) => updateServiceDetailsField(idx, "content1", e.target.value)}
+                    rows={3}
+                    className="w-full rounded-xl border border-border/30 bg-background p-3 text-xs"
+                  />
+                </div>
+
+                {/* stats array */}
+                <div className="grid gap-4 md:grid-cols-3">
+                  {(srv.details?.stats || []).map((stat, sIdx) => (
+                    <div key={sIdx} className="p-3 rounded-xl border border-border/30 bg-background/50 space-y-1.5">
+                      <span className="text-[9px] font-black text-muted-foreground">{isRTL ? `إحصائية رقم ${sIdx + 1}` : `Stat ${sIdx + 1}`}</span>
+                      <Input
+                        value={stat.val || ""}
+                        onChange={(e) => updateServiceStatItem(idx, sIdx, "val", e.target.value)}
+                        placeholder="val (e.g. 7-21 Days)"
+                        className="rounded-xl text-[10px] h-8 bg-card"
+                      />
+                      <Input
+                        value={stat.label || ""}
+                        onChange={(e) => updateServiceStatItem(idx, sIdx, "label", e.target.value)}
+                        placeholder="label (e.g. Oil deployment)"
+                        className="rounded-xl text-[10px] h-8 bg-card"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* benefits array */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-black text-muted-foreground block">{isRTL ? "المزايا والفوائد (4 نقاط)" : "Key Benefits (4 Points)"}</span>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {(srv.details?.benefits || []).map((benefit, bIdx) => (
+                      <div key={bIdx} className="flex gap-2 items-center">
+                        <span className="text-xs font-black text-primary">{bIdx + 1}.</span>
+                        <Input
+                          value={benefit || ""}
+                          onChange={(e) => updateServiceBenefitItem(idx, bIdx, e.target.value)}
+                          className="rounded-xl text-xs bg-card"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderContactPageEditor = () => {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "محتوى الصفحة الرئيسي" : "Page Header Content"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الرئيسي" : "Main Title"}</Label>
+              <Input
+                value={homepageForm?.title || ""}
+                onChange={(e) => updateHomepageField("title", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي" : "Subtitle"}</Label>
+              <Input
+                value={homepageForm?.subtitle || ""}
+                onChange={(e) => updateHomepageField("subtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان الفورم" : "Form Title"}</Label>
+              <Input
+                value={homepageForm?.formTitle || ""}
+                onChange={(e) => updateHomepageField("formTitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "وصف الفورم" : "Form Description"}</Label>
+              <Input
+                value={homepageForm?.formDesc || ""}
+                onChange={(e) => updateHomepageField("formDesc", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "عناوين ونصوص الفورم" : "Contact Form Text Labels"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "ليبل الاسم" : "Name Label"}</Label>
+              <Input
+                value={homepageForm?.nameLabel || ""}
+                onChange={(e) => updateHomepageField("nameLabel", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "ليبل الإيميل" : "Email Label"}</Label>
+              <Input
+                value={homepageForm?.emailLabel || ""}
+                onChange={(e) => updateHomepageField("emailLabel", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "ليبل الشركة" : "Company Label"}</Label>
+              <Input
+                value={homepageForm?.companyLabel || ""}
+                onChange={(e) => updateHomepageField("companyLabel", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "ليبل الرسالة" : "Message Label"}</Label>
+              <Input
+                value={homepageForm?.messageLabel || ""}
+                onChange={(e) => updateHomepageField("messageLabel", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "زر الإرسال" : "Submit Button text"}</Label>
+              <Input
+                value={homepageForm?.submitBtn || ""}
+                onChange={(e) => updateHomepageField("submitBtn", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "نص جاري الإرسال" : "Sending text"}</Label>
+              <Input
+                value={homepageForm?.sending || ""}
+                onChange={(e) => updateHomepageField("sending", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "رسالة نجاح الإرسال" : "Success Toast Message"}</Label>
+            <Input
+              value={homepageForm?.successMsg || ""}
+              onChange={(e) => updateHomepageField("successMsg", e.target.value)}
+              className="rounded-xl text-xs"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "بيانات وعناوين الاتصال المباشر" : "Direct Contact Information Details"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان المكتوب الجانبي" : "Contact Info Title"}</Label>
+              <Input
+                value={homepageForm?.contactInfoTitle || ""}
+                onChange={(e) => updateHomepageField("contactInfoTitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان ليبل المقر الرئيسي" : "Address Label text"}</Label>
+              <Input
+                value={homepageForm?.addressLabel || ""}
+                onChange={(e) => updateHomepageField("addressLabel", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "قيمة العنوان للمقر الرئيسي" : "Address Value"}</Label>
+              <Input
+                value={homepageForm?.addressVal || ""}
+                onChange={(e) => updateHomepageField("addressVal", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان ليبل الهاتف" : "Phone Label text"}</Label>
+              <Input
+                value={homepageForm?.phoneLabel || ""}
+                onChange={(e) => updateHomepageField("phoneLabel", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان ليبل البريد" : "Email Label text"}</Label>
+              <Input
+                value={homepageForm?.emailLabelField || ""}
+                onChange={(e) => updateHomepageField("emailLabelField", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان التغطية الإقليمية" : "Coverage Section Title"}</Label>
+              <Input
+                value={homepageForm?.coverageTitle || ""}
+                onChange={(e) => updateHomepageField("coverageTitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "قيمة الدول المغطاة" : "Coverage Value text"}</Label>
+              <Input
+                value={homepageForm?.coverageDesc || ""}
+                onChange={(e) => updateHomepageField("coverageDesc", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderClientsPageEditor = () => {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "محتوى الصفحة الرئيسي" : "Page Header Content"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الرئيسي" : "Main Title"}</Label>
+              <Input
+                value={homepageForm?.title || ""}
+                onChange={(e) => updateHomepageField("title", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي" : "Subtitle"}</Label>
+              <Input
+                value={homepageForm?.subtitle || ""}
+                onChange={(e) => updateHomepageField("subtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان القسم الرئيسي" : "Trust Section Title"}</Label>
+              <Input
+                value={homepageForm?.trustTitle || ""}
+                onChange={(e) => updateHomepageField("trustTitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي للقسم" : "Trust Subtitle"}</Label>
+              <Input
+                value={homepageForm?.trustSubtitle || ""}
+                onChange={(e) => updateHomepageField("trustSubtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان قائمة الشركاء" : "Client List Title"}</Label>
+            <Input
+              value={homepageForm?.clientListTitle || ""}
+              onChange={(e) => updateHomepageField("clientListTitle", e.target.value)}
+              className="rounded-xl text-xs"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "إحصائيات وقيم الثقة (3 إحصائيات)" : "Trust Statistics (3 Stats)"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-3 pt-2">
+            {(homepageForm?.stats || []).map((stat, idx) => (
+              <div key={idx} className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-2">
+                <span className="text-[10px] font-black text-primary">{isRTL ? `إحصائية ${idx + 1}` : `Stat ${idx + 1}`}</span>
+                <Input
+                  value={stat.val || ""}
+                  onChange={(e) => updateHomepageListItem("stats", idx, "val", e.target.value)}
+                  placeholder="e.g. 45+"
+                  className="rounded-xl text-xs bg-card"
+                />
+                <Input
+                  value={stat.label || ""}
+                  onChange={(e) => updateHomepageListItem("stats", idx, "label", e.target.value)}
+                  placeholder="e.g. International Clients"
+                  className="rounded-xl text-xs bg-card"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "قائمة الشركاء والعملاء (7 شركاء)" : "Clients & Partners List (7 Clients)"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2 pt-2">
+            {(homepageForm?.clients || []).map((client, idx) => (
+              <div key={idx} className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-2">
+                <span className="text-[10px] font-black text-primary">{isRTL ? `شريك ${idx + 1}` : `Client ${idx + 1}`}</span>
+                <Input
+                  value={client.name || ""}
+                  onChange={(e) => updateHomepageListItem("clients", idx, "name", e.target.value)}
+                  placeholder="e.g. ENI"
+                  className="rounded-xl text-xs bg-card"
+                />
+                <textarea
+                  value={client.desc || ""}
+                  onChange={(e) => updateHomepageListItem("clients", idx, "desc", e.target.value)}
+                  placeholder="Description..."
+                  rows={2}
+                  className="w-full rounded-xl border border-border/30 bg-background/80 p-2 text-xs"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCertificationsPageEditor = () => {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "محتوى الصفحة الرئيسي" : "Page Header Content"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الرئيسي" : "Main Title"}</Label>
+              <Input
+                value={homepageForm?.title || ""}
+                onChange={(e) => updateHomepageField("title", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "العنوان الفرعي" : "Subtitle"}</Label>
+              <Input
+                value={homepageForm?.subtitle || ""}
+                onChange={(e) => updateHomepageField("subtitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان قسم الشهادات" : "Certs Section Title"}</Label>
+              <Input
+                value={homepageForm?.certSectionTitle || ""}
+                onChange={(e) => updateHomepageField("certSectionTitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "وصف قسم الشهادات" : "Certs Section Description"}</Label>
+              <Input
+                value={homepageForm?.certSectionDesc || ""}
+                onChange={(e) => updateHomepageField("certSectionDesc", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "عنوان قسم القيم" : "Values Section Title"}</Label>
+              <Input
+                value={homepageForm?.valuesSectionTitle || ""}
+                onChange={(e) => updateHomepageField("valuesSectionTitle", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-bold text-muted-foreground">{isRTL ? "وصف قسم القيم" : "Values Section Description"}</Label>
+              <Input
+                value={homepageForm?.valuesSectionDesc || ""}
+                onChange={(e) => updateHomepageField("valuesSectionDesc", e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "شهادات الآيزو والجودة (3 شهادات)" : "ISO Certifications (3 Certs)"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-3 pt-2">
+            {(homepageForm?.certs || []).map((cert, idx) => (
+              <div key={idx} className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-2">
+                <span className="text-[10px] font-black text-primary">{isRTL ? `شهادة ${idx + 1}` : `Cert ${idx + 1}`}</span>
+                <Input
+                  value={cert.code || ""}
+                  onChange={(e) => updateHomepageListItem("certs", idx, "code", e.target.value)}
+                  placeholder="e.g. ISO 9001"
+                  className="rounded-xl text-xs bg-card font-extrabold"
+                />
+                <Input
+                  value={cert.title || ""}
+                  onChange={(e) => updateHomepageListItem("certs", idx, "title", e.target.value)}
+                  placeholder="Title..."
+                  className="rounded-xl text-xs bg-card"
+                />
+                <textarea
+                  value={cert.desc || ""}
+                  onChange={(e) => updateHomepageListItem("certs", idx, "desc", e.target.value)}
+                  placeholder="Description..."
+                  rows={3}
+                  className="w-full rounded-xl border border-border/30 bg-background/80 p-2 text-xs"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-4 border-b border-border/10 pb-6">
+          <h4 className="font-extrabold text-sm text-[#003366] dark:text-white uppercase tracking-wider">
+            {isRTL ? "القيم الأساسية للشركة (4 قيم)" : "Core Operational Values (4 Values)"}
+          </h4>
+          <div className="grid gap-4 md:grid-cols-2 pt-2">
+            {(homepageForm?.values || []).map((val, idx) => (
+              <div key={idx} className="p-3 rounded-xl bg-muted/40 border border-border/30 space-y-2">
+                <span className="text-[10px] font-black text-primary">{isRTL ? `قيمة ${idx + 1}` : `Value ${idx + 1}`}</span>
+                <Input
+                  value={val.title || ""}
+                  onChange={(e) => updateHomepageListItem("values", idx, "title", e.target.value)}
+                  placeholder="Title..."
+                  className="rounded-xl text-xs bg-card font-extrabold"
+                />
+                <textarea
+                  value={val.desc || ""}
+                  onChange={(e) => updateHomepageListItem("values", idx, "desc", e.target.value)}
+                  placeholder="Description..."
+                  rows={3}
+                  className="w-full rounded-xl border border-border/30 bg-background/80 p-2 text-xs"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#003366]/5 via-background to-primary/5 font-sans">
@@ -1582,17 +2518,38 @@ export default function AdminPage() {
 
           {activeTab === "homepage" && (
             <div className="space-y-6">
-              {/* Homepage Editor Layout */}
+              {/* Page Select Dropdown */}
+              <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-[24px] border border-border/30 bg-card shadow-md">
+                <div className="space-y-1">
+                  <Label className="text-xs font-bold text-muted-foreground">{isRTL ? "اختر الصفحة للتعديل" : "Select Page to Edit"}</Label>
+                  <select
+                    value={editingPageKey}
+                    onChange={(e) => setEditingPageKey(e.target.value)}
+                    className="block w-64 rounded-xl border border-border/40 bg-background px-3.5 py-2.5 text-xs font-extrabold text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary cursor-pointer shadow-sm"
+                  >
+                    <option value="homepage">{isRTL ? "الصفحة الرئيسية" : "Homepage"}</option>
+                    <option value="about">{isRTL ? "من نحن" : "About Us"}</option>
+                    <option value="presence">{isRTL ? "التواجد الإقليمي" : "Global Presence"}</option>
+                    <option value="timeline">{isRTL ? "مخطط النمو / التايم لاين" : "Milestones Timeline"}</option>
+                    <option value="services">{isRTL ? "الخدمات التقنية" : "Services List"}</option>
+                    <option value="contact">{isRTL ? "بيانات الاتصال" : "Contact Info"}</option>
+                    <option value="clients">{isRTL ? "شركاء النجاح / العملاء" : "Clients & Partners"}</option>
+                    <option value="certifications">{isRTL ? "الشهادات والقيم" : "Certifications & Values"}</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* General Page Editor Layout */}
               <Card className="border-border/30 rounded-[28px] shadow-xl overflow-hidden bg-card">
                 <CardHeader className="pb-4 border-b border-border/10 px-6 pt-6 bg-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <CardTitle className="text-base font-extrabold text-foreground">
-                      {isRTL ? "محرر الصفحة الرئيسية" : "Homepage Editor"}
+                      {isRTL ? "محرر محتوى الصفحات" : "Page Content Editor"}
                     </CardTitle>
                     <CardDescription className="text-xs font-medium mt-1">
                       {isRTL 
-                        ? "قم بتعديل محتوى نصوص وصور كافة سكاشن الصفحة الرئيسية باللغتين العربية والإنجليزية." 
-                        : "Edit text and images for all homepage sections in Arabic and English."}
+                        ? `تعديل نصوص وصور صفحة (${editingPageKey}) باللغتين العربية والإنجليزية.` 
+                        : `Edit text and images for ${editingPageKey} page in Arabic and English.`}
                     </CardDescription>
                   </div>
 
@@ -1602,10 +2559,13 @@ export default function AdminPage() {
                       <button
                         onClick={() => {
                           setHomepageLang("ar");
+                          const fallback = editingPageKey === "homepage" 
+                            ? defaultHomepageContent.ar 
+                            : defaultPagesContent[editingPageKey].ar;
                           if (homepageData.ar) {
-                            setHomepageForm({ ...defaultHomepageContent.ar, ...homepageData.ar });
+                            setHomepageForm({ ...fallback, ...homepageData.ar });
                           } else {
-                            setHomepageForm(defaultHomepageContent.ar);
+                            setHomepageForm(fallback);
                           }
                         }}
                         className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
@@ -1617,10 +2577,13 @@ export default function AdminPage() {
                       <button
                         onClick={() => {
                           setHomepageLang("en");
+                          const fallback = editingPageKey === "homepage" 
+                            ? defaultHomepageContent.en 
+                            : defaultPagesContent[editingPageKey].en;
                           if (homepageData.en) {
-                            setHomepageForm({ ...defaultHomepageContent.en, ...homepageData.en });
+                            setHomepageForm({ ...fallback, ...homepageData.en });
                           } else {
-                            setHomepageForm(defaultHomepageContent.en);
+                            setHomepageForm(fallback);
                           }
                         }}
                         className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
@@ -1644,10 +2607,12 @@ export default function AdminPage() {
                 <CardContent className="p-6 space-y-8">
                   {homepageLoading ? (
                     <div className="py-20 text-center text-xs font-extrabold text-muted-foreground">
-                      {isRTL ? "جاري تحميل محتوى الصفحة الرئيسية..." : "Loading homepage content..."}
+                      {isRTL ? "جاري تحميل محتوى الصفحة..." : "Loading page content..."}
                     </div>
                   ) : (
-                    <div className="space-y-6">
+                    <>
+                      {editingPageKey === "homepage" && (
+                        <div className="space-y-6">
                       
                       {/* 1. Hero Section Form */}
                       <div className="space-y-4 border-b border-border/10 pb-6">
@@ -2092,9 +3057,17 @@ export default function AdminPage() {
                           ))}
                         </div>
 
+                        </div>
                       </div>
-
-                    </div>
+                    )}
+                      {editingPageKey === "about" && renderAboutPageEditor()}
+                      {editingPageKey === "presence" && renderPresencePageEditor()}
+                      {editingPageKey === "timeline" && renderTimelinePageEditor()}
+                      {editingPageKey === "services" && renderServicesPageEditor()}
+                      {editingPageKey === "contact" && renderContactPageEditor()}
+                      {editingPageKey === "clients" && renderClientsPageEditor()}
+                      {editingPageKey === "certifications" && renderCertificationsPageEditor()}
+                    </>
                   )}
                 </CardContent>
               </Card>

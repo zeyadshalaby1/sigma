@@ -1,16 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Calendar, Briefcase, ChevronRight, ChevronLeft } from "lucide-react";
 import { useParams } from "next/navigation";
+import { mergeContent } from "@/lib/merge-content";
 
 export default function TimelinePage() {
   const params = useParams();
   const lang = params.lang;
   const isRTL = lang === "ar";
 
-  const content = {
+  const [dbContent, setDbContent] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/admin/page-content?key=timeline`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data[lang]) {
+          setDbContent(data[lang]);
+        }
+      })
+      .catch((err) => console.error("Error loading timeline page content:", err));
+  }, [lang]);
+
+  const fallbackContent = {
     ar: {
       title: "مسيرة النمو والتوسع",
       subtitle: "25 عاماً من الإنجازات والنمو المستمر في تقديم الحلول النفطية المتكاملة.",
@@ -54,6 +68,8 @@ export default function TimelinePage() {
       ]
     }
   }[lang] || { ar: {}, en: {} };
+
+  const content = mergeContent(fallbackContent, dbContent);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">

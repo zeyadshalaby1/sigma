@@ -546,8 +546,21 @@ export default function Home({ params }) {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden font-sans">
       
-      {/* 1. HERO SECTION WITH PARTICLE BACKGROUND */}
+      {/* 1. HERO SECTION WITH VIDEO BACKGROUND */}
       <section className="relative pt-24 pb-28 md:py-36 flex flex-col items-center justify-center text-center px-6 min-h-[90vh] overflow-hidden border-b border-border/10">
+        
+        {/* Background Video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover -z-20"
+          src="/Sigma%20website/sigma%20video.mp4"
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/60 dark:bg-black/70 -z-[15]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-transparent to-background/80 -z-[14]" />
         
         {/* Pulsing petroleum glow blobs in the background */}
         <motion.div
@@ -608,7 +621,7 @@ export default function Home({ params }) {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 rounded-full border border-border/30 bg-card/50 px-4.5 py-2 text-xs md:text-sm font-bold text-foreground mb-8 shadow-sm backdrop-blur-md hover:border-primary/20 transition-all duration-300"
+          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4.5 py-2 text-xs md:text-sm font-bold text-white mb-8 shadow-sm backdrop-blur-md hover:border-primary/20 transition-all duration-300"
         >
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -622,7 +635,7 @@ export default function Home({ params }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight max-w-5xl leading-[1.1] text-foreground"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight max-w-5xl leading-[1.1] text-white drop-shadow-lg"
         >
           {content.hero_title}
         </motion.h1>
@@ -632,7 +645,7 @@ export default function Home({ params }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="max-w-3xl text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed mt-8 font-medium"
+          className="max-w-3xl text-white/80 text-sm sm:text-base md:text-lg leading-relaxed mt-8 font-medium drop-shadow"
         >
           {content.hero_subtitle}
         </motion.p>
@@ -654,15 +667,15 @@ export default function Home({ params }) {
           <Button
             size="lg"
             onClick={() => setIsVideoModalOpen(true)}
-            className="w-full sm:w-auto bg-muted/50 hover:bg-muted/80 text-foreground border border-border/40 backdrop-blur-md font-bold cursor-pointer gap-2 h-12 px-8 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200 rounded-xl"
+            className="w-full sm:w-auto bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-md font-bold cursor-pointer gap-2 h-12 px-8 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200 rounded-xl"
           >
-            <Play className="h-4 w-4 fill-current text-primary" />
+            <Play className="h-4 w-4 fill-current text-white" />
             {content.cta_watch_video}
           </Button>
 
           <a href="/Sigma%20website/Sigma%20Presentation.pdf" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-            <Button size="lg" variant="outline" className="w-full cursor-pointer h-12 px-8 border-border/40 text-foreground bg-transparent hover:bg-muted/40 gap-2 transform hover:-translate-y-0.5 transition-all duration-200 rounded-xl">
-              <FileText className="h-4 w-4 text-primary" />
+            <Button size="lg" variant="outline" className="w-full cursor-pointer h-12 px-8 border-white/20 text-white bg-white/10 hover:bg-white/20 gap-2 transform hover:-translate-y-0.5 transition-all duration-200 rounded-xl">
+              <FileText className="h-4 w-4 text-white" />
               {content.cta_profile}
             </Button>
           </a>
@@ -675,21 +688,21 @@ export default function Home({ params }) {
           transition={{ duration: 0.8, delay: 0.5 }}
           className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-4xl px-4"
         >
-          <div className="p-6 rounded-2xl bg-card border border-border/40 backdrop-blur-sm text-center space-y-2 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 transform hover:-translate-y-1">
-            <span className="block text-3xl md:text-4xl font-black text-[#E61C24]">{content.stats_legacy_num}</span>
-            <span className="block text-[10px] md:text-xs text-muted-foreground font-extrabold uppercase tracking-widest">{content.stats_legacy_lbl}</span>
+          <div className="p-6 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md text-center space-y-2 shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1">
+            <span className="block text-3xl md:text-4xl font-black text-[#FF4D54]">{content.stats_legacy_num}</span>
+            <span className="block text-[10px] md:text-xs text-white/70 font-extrabold uppercase tracking-widest">{content.stats_legacy_lbl}</span>
           </div>
-          <div className="p-6 rounded-2xl bg-card border border-border/40 backdrop-blur-sm text-center space-y-2 shadow-sm hover:shadow-xl hover:border-[#003366]/20 dark:hover:border-primary/20 transition-all duration-300 transform hover:-translate-y-1">
-            <span className="block text-3xl md:text-4xl font-black text-[#003366] dark:text-[#FF3B43]">{content.stats_countries_num}</span>
-            <span className="block text-[10px] md:text-xs text-muted-foreground font-extrabold uppercase tracking-widest">{content.stats_countries_lbl}</span>
+          <div className="p-6 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md text-center space-y-2 shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1">
+            <span className="block text-3xl md:text-4xl font-black text-[#5BA3FF]">{content.stats_countries_num}</span>
+            <span className="block text-[10px] md:text-xs text-white/70 font-extrabold uppercase tracking-widest">{content.stats_countries_lbl}</span>
           </div>
-          <div className="p-6 rounded-2xl bg-card border border-border/40 backdrop-blur-sm text-center space-y-2 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 transform hover:-translate-y-1">
-            <span className="block text-3xl md:text-4xl font-black text-foreground">{content.stats_uptime_num}</span>
-            <span className="block text-[10px] md:text-xs text-muted-foreground font-extrabold uppercase tracking-widest">{content.stats_uptime_lbl}</span>
+          <div className="p-6 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md text-center space-y-2 shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1">
+            <span className="block text-3xl md:text-4xl font-black text-white">{content.stats_uptime_num}</span>
+            <span className="block text-[10px] md:text-xs text-white/70 font-extrabold uppercase tracking-widest">{content.stats_uptime_lbl}</span>
           </div>
-          <div className="p-6 rounded-2xl bg-card border border-border/40 backdrop-blur-sm text-center space-y-2 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 transform hover:-translate-y-1">
-            <span className="block text-3xl md:text-4xl font-black text-[#E61C24]">{content.stats_capacity_num}</span>
-            <span className="block text-[10px] md:text-xs text-muted-foreground font-extrabold uppercase tracking-widest">{content.stats_capacity_lbl}</span>
+          <div className="p-6 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md text-center space-y-2 shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 transform hover:-translate-y-1">
+            <span className="block text-3xl md:text-4xl font-black text-[#FF4D54]">{content.stats_capacity_num}</span>
+            <span className="block text-[10px] md:text-xs text-white/70 font-extrabold uppercase tracking-widest">{content.stats_capacity_lbl}</span>
           </div>
         </motion.div>
       </section>

@@ -7,10 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, Send, Globe } from "lucide-react";
 import { toast } from "sonner";
+import { useParams } from "next/navigation";
 
-export default function ContactPage({ params }) {
-  const resolvedParams = React.use(params);
-  const lang = resolvedParams.lang;
+export default function ContactPage() {
+  const params = useParams();
+  const lang = params.lang;
   const isRTL = lang === "ar";
 
   const [name, setName] = useState("");

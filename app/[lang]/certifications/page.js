@@ -3,10 +3,11 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, ShieldCheck, Flame, Scale, Lightbulb, Compass, Award, Clock } from "lucide-react";
+import { useParams } from "next/navigation";
 
-export default function CertificationsPage({ params }) {
-  const resolvedParams = React.use(params);
-  const lang = resolvedParams.lang;
+export default function CertificationsPage() {
+  const params = useParams();
+  const lang = params.lang;
   const isRTL = lang === "ar";
 
   const content = {

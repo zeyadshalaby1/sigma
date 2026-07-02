@@ -168,8 +168,7 @@ const MAP_COUNTRIES = [
 ];
 
 export default function HomeClient({ params, dbContent }) {
-  const resolvedParams = React.use(params);
-  const lang = resolvedParams.lang;
+  const lang = params?.lang || "en";
   const isRTL = lang === "ar";
 
   // Form State

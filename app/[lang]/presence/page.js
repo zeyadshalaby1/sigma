@@ -3,10 +3,11 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Phone, Building2, Globe } from "lucide-react";
+import { useParams } from "next/navigation";
 
-export default function GlobalPresencePage({ params }) {
-  const resolvedParams = React.use(params);
-  const lang = resolvedParams.lang;
+export default function GlobalPresencePage() {
+  const params = useParams();
+  const lang = params.lang;
   const isRTL = lang === "ar";
 
   const content = {

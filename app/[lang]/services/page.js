@@ -15,10 +15,11 @@ import {
   CheckCircle2,
   Cpu
 } from "lucide-react";
+import { useParams } from "next/navigation";
 
-export default function ServicesPage({ params }) {
-  const resolvedParams = React.use(params);
-  const lang = resolvedParams.lang;
+export default function ServicesPage() {
+  const params = useParams();
+  const lang = params.lang;
   const isRTL = lang === "ar";
 
   const [activeTab, setActiveTab] = useState(0);

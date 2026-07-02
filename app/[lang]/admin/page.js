@@ -42,7 +42,7 @@ import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Ba
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { BlogRichEditor } from "@/components/blog-rich-editor";
 import { useTheme } from "next-themes";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import { defaultHomepageContent } from "@/lib/default-homepage";
 
@@ -109,9 +109,9 @@ const COUNTRY_COORDS = {
   unknown: [0, 20],
 };
 
-export default function AdminPage({ params }) {
-  const resolvedParams = React.use(params);
-  const lang = resolvedParams.lang;
+export default function AdminPage() {
+  const params = useParams();
+  const lang = params.lang;
   const isRTL = lang === "ar";
   
   const router = useRouter();

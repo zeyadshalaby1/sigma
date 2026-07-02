@@ -3,10 +3,11 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Calendar, Briefcase, ChevronRight, ChevronLeft } from "lucide-react";
+import { useParams } from "next/navigation";
 
-export default function TimelinePage({ params }) {
-  const resolvedParams = React.use(params);
-  const lang = resolvedParams.lang;
+export default function TimelinePage() {
+  const params = useParams();
+  const lang = params.lang;
   const isRTL = lang === "ar";
 
   const content = {

@@ -3,10 +3,11 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Handshake, Award, ShieldAlert, BadgeCheck } from "lucide-react";
+import { useParams } from "next/navigation";
 
-export default function ClientsPage({ params }) {
-  const resolvedParams = React.use(params);
-  const lang = resolvedParams.lang;
+export default function ClientsPage() {
+  const params = useParams();
+  const lang = params.lang;
   const isRTL = lang === "ar";
 
   const content = {

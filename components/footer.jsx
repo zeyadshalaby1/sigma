@@ -147,21 +147,21 @@ export function Footer({ dict, socialLinks }) {
                 <div className="p-1.5 rounded-full bg-white/5 text-primary">
                   <Phone className="h-3.5 w-3.5" />
                 </div>
-                <span dir="ltr" className="hover:text-white transition-colors cursor-pointer">+20 123 456 7890</span>
+                <span dir="ltr" className="hover:text-white transition-colors cursor-pointer">+20 3 481 2620</span>
               </li>
               <li className="flex items-center justify-center md:justify-start gap-3">
                 <div className="p-1.5 rounded-full bg-white/5 text-primary">
                   <Mail className="h-3.5 w-3.5" />
                 </div>
-                <a href="mailto:conact@sigmapetroleum.com" className="hover:text-white transition-colors">
-                  conact@sigmapetroleum.com
+                <a href="mailto:contact@sigmagroupegypt.com" className="hover:text-white transition-colors">
+                  contact@sigmagroupegypt.com
                 </a>
               </li>
               <li className="flex items-center justify-center md:justify-start gap-3">
                 <div className="p-1.5 rounded-full bg-white/5 text-primary">
                   <MapPin className="h-3.5 w-3.5" />
                 </div>
-                <span className="hover:text-white transition-colors">{isAr ? "القاهرة، مصر" : "Cairo, Egypt"}</span>
+                <span className="hover:text-white transition-colors">{isAr ? "الإسكندرية، مصر" : "Alexandria, Egypt"}</span>
               </li>
             </ul>
           </div>

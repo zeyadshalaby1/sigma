@@ -54,7 +54,7 @@ export async function generateMetadata({ params }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sigmapetroleum.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sigmagroupegypt.com";
 
   return {
     title: {
@@ -140,7 +140,7 @@ function OrganizationSchema({ lang, dict, baseUrl, socialLinks }) {
     foundingDate: dict.seo?.schema_founding_year || "2020",
     address: {
       "@type": "PostalAddress",
-      addressLocality: dict.seo?.schema_address_locality || "Cairo",
+      addressLocality: dict.seo?.schema_address_locality || "Alexandria",
       addressCountry: dict.seo?.schema_address_country || "Egypt",
     },
     areaServed: {
@@ -149,7 +149,7 @@ function OrganizationSchema({ lang, dict, baseUrl, socialLinks }) {
     },
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: "+20-123-456-7890",
+      telephone: "+20-3-481-2620",
       contactType: "customer service",
       availableLanguage: ["Arabic", "English"],
     },
@@ -222,11 +222,11 @@ function LocalBusinessSchema({ dict, baseUrl }) {
     name: "Sigma Petroleum Services",
     image: `${baseUrl}/Sigma website/Sigma Logo/Orignal Logo.png`,
     url: baseUrl,
-    telephone: "+20-123-456-7890",
-    email: "conact@sigmapetroleum.com",
+    telephone: "+20-3-481-2620",
+    email: "contact@sigmagroupegypt.com",
     address: {
       "@type": "PostalAddress",
-      addressLocality: dict.seo?.schema_address_locality || "Cairo",
+      addressLocality: dict.seo?.schema_address_locality || "Alexandria",
       addressCountry: dict.seo?.schema_address_country || "EG",
     },
     priceRange: "$$$",
@@ -251,7 +251,7 @@ export default async function LangLayout({ children, params }) {
   const dict = await getDictionary(lang);
   const dir = lang === "ar" ? "rtl" : "ltr";
   const fontClass = lang === "ar" ? cairo.variable : inter.variable;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sigmapetroleum.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sigmagroupegypt.com";
   const socialLinks = await fetchSocialLinks();
 
   return (

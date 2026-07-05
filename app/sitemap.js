@@ -1,5 +1,5 @@
 export default function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sigmapetroleum.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sigmagroupegypt.com";
 
   const routes = ["", "#about", "#services", "#contact"];
   const locales = ["en", "ar"];

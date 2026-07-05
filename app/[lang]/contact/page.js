@@ -153,8 +153,8 @@ export default function ContactPage() {
                   </div>
                   <div className="space-y-1">
                     <span className="block font-extrabold text-foreground text-xs md:text-sm">{content.emailLabelField}</span>
-                    <a href="mailto:conact@sigmapetroleum.com" className="block text-muted-foreground hover:text-primary transition-colors font-medium text-xs md:text-sm">
-                      conact@sigmapetroleum.com
+                    <a href="mailto:contact@sigmagroupegypt.com" className="block text-muted-foreground hover:text-primary transition-colors font-medium text-xs md:text-sm">
+                      contact@sigmagroupegypt.com
                     </a>
                   </div>
                 </div>

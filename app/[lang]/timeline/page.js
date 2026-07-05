@@ -99,12 +99,12 @@ export default function TimelinePage() {
               {isRTL ? "مخطط مسيرة النمو والتوسع" : "Milestone Overview Map"}
             </h3>
           </div>
-          <div className="relative overflow-hidden rounded-2xl border border-border/20 max-w-4xl mx-auto bg-muted/20 p-4 md:p-6 flex items-center justify-center">
+          <div className="relative overflow-hidden rounded-2xl border border-border/20 max-w-4xl mx-auto bg-white p-4 md:p-6 flex items-center justify-center shadow-inner">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src="/Sigma website/time line.png" 
               alt="Sigma Timeline Chart" 
-              className="max-h-[350px] object-contain rounded-xl hover:scale-102 transition-transform duration-300 filter dark:brightness-95 dark:contrast-105" 
+              className="max-h-[350px] object-contain rounded-xl hover:scale-102 transition-transform duration-300" 
             />
           </div>
         </div>

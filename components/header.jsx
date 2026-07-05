@@ -48,11 +48,12 @@ export function Header({ lang, dict }) {
   }
 
   const navLinks = [
-    { href: `/${lang}`, label: dict?.nav?.home },
-    { href: `/${lang}/blog`, label: lang === "ar" ? "المدونة" : "Blog" },
+    { href: `/${lang}`, label: dict?.nav?.home || (lang === "ar" ? "الرئيسية" : "Home") },
+    { href: `/${lang}/about`, label: lang === "ar" ? "من نحن" : "Who We Are" },
     { href: `/${lang}/services`, label: dict?.nav?.services || (lang === "ar" ? "خدماتنا" : "Services") },
     { href: `/${lang}/timeline`, label: lang === "ar" ? "مسيرتنا" : "Timeline" },
-    { href: `/${lang}/about`, label: dict?.nav?.about || (lang === "ar" ? "من نحن" : "About") },
+    { href: `/${lang}/marine-supply`, label: lang === "ar" ? "التوريدات والبحرية" : "Supply & Marine" },
+    { href: `/${lang}/blog`, label: lang === "ar" ? "المدونة" : "Blog" },
     { href: `/${lang}/contact`, label: dict?.nav?.contact || (lang === "ar" ? "تواصل معنا" : "Contact") },
   ];
 

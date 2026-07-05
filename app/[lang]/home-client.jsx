@@ -52,15 +52,16 @@ const HERO_PARTICLES = Array.from({ length: 20 }).map((_, i) => ({
 
 const getServiceIcon = (index) => {
   switch (index) {
-    case 0: return <Settings className="h-5 w-5 text-[#E61C24]" />;
+    case 0: return <Layers className="h-5 w-5 text-[#E61C24]" />;
     case 1: return <Flame className="h-5 w-5 text-[#003366] dark:text-blue-400" />;
     case 2: return <Activity className="h-5 w-5 text-[#E61C24]" />;
     case 3: return <Droplet className="h-5 w-5 text-[#003366] dark:text-blue-400" />;
     case 4: return <Gauge className="h-5 w-5 text-[#E61C24]" />;
     case 5: return <Flame className="h-5 w-5 text-orange-500" />;
-    case 6: return <Cpu className="h-5 w-5 text-[#E61C24]" />;
-    case 7: return <Truck className="h-5 w-5 text-[#003366] dark:text-blue-400" />;
-    case 8: return <Gauge className="h-5 w-5 text-orange-500" />;
+    case 6: return <Zap className="h-5 w-5 text-[#E61C24]" />;
+    case 7: return <Settings className="h-5 w-5 text-[#003366] dark:text-blue-400" />;
+    case 8: return <Truck className="h-5 w-5 text-orange-500" />;
+    case 9: return <Gauge className="h-5 w-5 text-[#E61C24]" />;
     default: return <Briefcase className="h-5 w-5 text-[#E61C24]" />;
   }
 };
@@ -204,7 +205,7 @@ export default function HomeClient({ params, dbContent }) {
   const fallbackContent = {
     ar: {
       hero_badge: "عضو فخور في مجموعة سيجما — تأسست عام 1959",
-      hero_title: "بنيت على الإرث .. يقودها الأداء",
+      hero_title: "بنيت على الإرث ..\nيقودها الأداء",
       hero_subtitle: "حلول متكاملة لحقول النفط والغاز عبر منطقة الشرق الأوسط وشمال إفريقيا وأفريقيا — سريعة، موثوقة، ومصممة للأداء.",
       cta_primary: "استكشف خدماتنا",
       cta_watch_video: "شاهد الفيديو",
@@ -235,51 +236,56 @@ export default function HomeClient({ params, dbContent }) {
       services_subtitle: "حلول نفطية متكاملة لزيادة الأداء والكفاءة",
       services: [
         {
-          title: "مرافق الإنتاج المبكر (EPF)",
-          desc: "حلول جاهزة لمرافق الإنتاج المبكر على أساس التأجير والتشغيل والصيانة - يتم نشرها في غضون 15-21 يوماً للنفط و 4 أشهر للغاز.",
-          img: "/Sigma%20website/Photos/Early%20Production%20Facilities/4.png"
+                "title": "مرافق الإنتاج المبكر (EPF)",
+                "desc": "حلول جاهزة لمرافق الإنتاج المبكر على أساس التأجير والتشغيل والصيانة - يتم نشرها في غضون 15-21 يوماً للنفط و 4 أشهر للغاز.",
+                "img": "/Sigma website/Photos/Early Production Facilities/4.png"
         },
         {
-          title: "أنظمة معالجة الغاز",
-          desc: "محطات معالجة غاز تركيبية متكاملة تماماً - من الهندسة والتوريد إلى التشغيل التجريبي والتشغيل الفعلي. أول إنتاج للغاز خلال 4 أشهر.",
-          img: "/Sigma%20website/Photos/Gas%20Treatment%20Systems/18.png"
+                "title": "أنظمة معالجة الغاز",
+                "desc": "محطات معالجة غاز تركيبية متكاملة تماماً - من الهندسة والتوريد إلى التشغيل التجريبي والتشغيل الفعلي. أول إنتاج للغاز خلال 4 أشهر.",
+                "img": "/Sigma website/Photos/Gas Treatment Systems/18.png"
         },
         {
-          title: "خدمات اختبار الآبار",
-          desc: "خدمات اختبار آبار متميزة مع أكثر من 25 عاماً من الخبرة في مصر والشرق الأوسط وأفريقيا - بيانات دقيقة لقرارات أكثر ذكاءً.",
-          img: "/Sigma%20website/Photos/Wel%20Testing%20Services/1.png"
+                "title": "خدمات اختبار الآبار",
+                "desc": "خدمات اختبار آبار متميزة مع أكثر من 25 عاماً من الخبرة في مصر والشرق الأوسط وأفريقيا - بيانات دقيقة لقرارات أكثر ذكاءً.",
+                "img": "/Sigma website/Photos/Wel Testing Services/1.png"
         },
         {
-          title: "معالجة المياه وإعادة حقنها",
-          desc: "تحويل المياه المصاحبة للإنتاج إلى أصل استراتيجي للخزان - أنظمة معالجة متقدمة لتعزيز استخلاص النفط (EOR).",
-          img: "/Sigma%20website/Photos/Water%20Treatment/45.png"
+                "title": "معالجة المياه وإعادة حقنها",
+                "desc": "تحويل المياه المصاحبة للإنتاج إلى أصل استراتيجي للخزان - أنظمة معالجة متقدمة لتعزيز استخلاص النفط (EOR).",
+                "img": "/new/3/water tretment.png"
         },
         {
-          title: "حلول ضغط الغاز",
-          desc: "أنظمة ضغط سريعة النشر بمعدل توفر تشغيلي يتجاوز 98% - بتهيئة تتراوح من 500 حصان إلى 2000 حصان.",
-          img: "/Sigma%20website/Photos/Gas%20Compression/1.png"
+                "title": "حلول ضغط الغاز",
+                "desc": "أنظمة ضغط سريعة النشر بمعدل توفر تشغيلي يتجاوز 98% - بتهيئة تتراوح من 500 حصان إلى 2000 حصان.",
+                "img": "/new/3/gas compression 1.png"
         },
         {
-          title: "استعادة الغاز المحروق",
-          desc: "حلول متكاملة لتقليل عمليات الحرق الروتينية للغاز - تحويل الغاز المهدر إلى تدفقات إنتاجية قابلة للتحقيق المالي.",
-          img: "/Sigma%20website/Photos/Flared%20Gas/98.png"
+                "title": "استعادة الغاز المحروق",
+                "desc": "حلول متكاملة لتقليل عمليات الحرق الروتينية للغاز - تحويل الغاز المهدر إلى تدفقات إنتاجية قابلة للتحقيق المالي.",
+                "img": "/new/3/flaerd gas.png"
         },
         {
-          title: "حلول الغاز للطاقة",
-          desc: "تحويل الغاز المصاحب والمحروق إلى طاقة كهربائية موثوقة - تقليل الاعتماد على الديزل وتكاليف التشغيل.",
-          img: "/Sigma%20website/Photos/Gas%20to%20Power/1.png"
+                "title": "حلول الغاز للطاقة",
+                "desc": "تحويل الغاز المصاحب والمحروق إلى طاقة كهربائية موثوقة - تقليل الاعتماد على الديزل وتكاليف التشغيل.",
+                "img": "/new/3/gas to power1.png"
         },
         {
-          title: "وحدات التدخل السريع وجذب الأنابيب (Flash-By)",
-          desc: "حفارات صيانة وحفر متطورة محمولة على شاحنات للتدخل السريع والآمن في الآبار في البيئات الصعبة.",
-          img: "/Sigma%20website/Photos/Flash%20By%20%26%20Puling%20Unit/1.png"
+                "title": "حلول المانيفولد منعدم الضغط",
+                "desc": "مجمعات تدفق ذات ضغط منخفض للغاية مصممة لتوزيع التدفق متعدد الأطوار بأمان وكفاءة وبأقل خسارة للضغط.",
+                "img": "/new/3/Zero Pressure Manifold1.png"
         },
         {
-          title: "أنظمة القياس ونقل الملكية",
-          desc: "دقة معتمدة لنقل الملكية، والقياس المالي، ومعاملات الغاز التجارية - ثقة في كل متر مكعب يتم قياسه.",
-          img: "/Sigma%20website/Photos/Metering%20Systems/1.png"
+                "title": "وحدات التدخل السريع وجذب الأنابيب (Flash-By)",
+                "desc": "حفارات صيانة وحفر متطورة محمولة على شاحنات للتدخل السريع والآمن في الآبار في البيئات الصعبة.",
+                "img": "/new/3/flash by1.png"
+        },
+        {
+                "title": "أنظمة القياس ونقل الملكية",
+                "desc": "دقة معتمدة لنقل الملكية، والقياس المالي، ومعاملات الغاز التجارية - ثقة في كل متر مكعب يتم قياسه.",
+                "img": "/new/3/metering1.png"
         }
-      ],
+],
       timeline_title: "مسيرة نمونا عبر السنوات",
       timeline_subtitle: "25 عاماً من التوسع الإقليمي والنجاح المتواصل",
       timeline_preview_text: "بدأنا العمل في مصر عام 2001، وخلال ربع قرن قمنا بالتوسع في سلطنة عُمان وسوريا والسعودية والمغرب وليبيا وكينيا والجزائر، مع إدخال أحدث التقنيات مثل وحدات معالجة الغاز ومكافحة حرق الغاز صفر (Zero-flare).",
@@ -327,7 +333,7 @@ export default function HomeClient({ params, dbContent }) {
         title: "مرفق نيدوكو للإنتاج المبكر — المرحلة الأولى",
         subtitle: "Petrobel (ENI / EGPC) | هندسة: ENPPI",
         tagline: "واحدة من أسرع منشآت الغاز التي تم بناؤها في مصر على الإطلاق",
-        img: "/Sigma%20website/Photos/Early%20Production%20Facilities/3.png",
+        img: "/new/2/nidoco1.png",
         stats: [
           { num: "180", unit: "مليون قدم³", label: "معالجة الغاز" },
           { num: "800", unit: "برميل/يوم", label: "متكثفات" },
@@ -338,7 +344,7 @@ export default function HomeClient({ params, dbContent }) {
         title: "مرفق نيدوكو للإنتاج المبكر — المرحلة الثانية",
         subtitle: "Petrobel (ENI / EGPC) | هندسة: ENPPI",
         tagline: "تغذي وتدعم أكبر محطة لتوليد الكهرباء في مصر",
-        img: "/Sigma%20website/Photos/Early%20Production%20Facilities/7.png",
+        img: "/new/2/nidoco2.png",
         stats: [
           { num: "360", unit: "مليون قدم³", label: "سعة معالجة الغاز" },
           { num: "1,600", unit: "برميل/يوم", label: "متكثفات" },
@@ -349,7 +355,7 @@ export default function HomeClient({ params, dbContent }) {
         title: "منشأة إنتاج ومعالجة الغاز",
         subtitle: "SUCO (RWE / EGPC)",
         tagline: "إنتاج موثوق متوسط المدى مع الحفاظ على التميز التشغيلي المستمر",
-        img: "/Sigma%20website/Photos/Gas%20Treatment%20Systems/5.png",
+        img: "/new/2/3.png",
         stats: [
           { num: "60", unit: "مليون قدم³", label: "معالجة الغاز" },
           { num: "شامل", unit: "طويل الأجل", label: "تشغيل وصيانة سيجما" },
@@ -374,7 +380,7 @@ export default function HomeClient({ params, dbContent }) {
   },
     en: {
       hero_badge: "A Proud Member of Sigma Group — Est. 1959",
-      hero_title: "Built on Legacy. Driven by Performance.",
+      hero_title: "Built on Legacy .. Driven\nBy Performance",
       hero_subtitle: "End-to-end oilfield solutions across the MENA region and Africa — fast, reliable, and built to perform.",
       cta_primary: "Explore Our Services",
       cta_watch_video: "Watch Video",
@@ -389,7 +395,7 @@ export default function HomeClient({ params, dbContent }) {
       stats_capacity_lbl: "MMSCFD Capacity",
       marquee_title: "Trusted by Global Energy Leaders",
       who_we_are_title: "Who We Are",
-      who_we_are_subtitle: "A Beacon of Excellence in Oil & Gas",
+      who_we_are_subtitle: "A Beacon of\nExcellence in Oil\n& Gas",
       who_we_are_text1: "Founded in 2001 as the dedicated oilfield services arm of Sigma Group, Sigma Petroleum Services delivers integrated, results-driven solutions designed to enhance well productivity and maximize asset value.",
       who_we_are_text2: "Supported by our sister companies Sigma Supplies and Sigma Innovation, we ensure faster execution, safer operations, and dependable delivery across every project. Today, with over 290 completed projects, we are recognized as a leader in the provision of fast-track and cost-effective production facilities.",
       who_we_are_text3: "As part of Sigma Group — a diversified conglomerate established in 1959 with a legacy spanning real estate development, steel trading, industrial chemicals, and marine equipment — Sigma Petroleum Services embodies innovation, quality, and reliability. Today, with over 290 completed projects, we are recognized as one of the leaders in the provision of fast-track and cost-effective production facilities across Egypt, the Middle East, and Africa.",
@@ -405,51 +411,56 @@ export default function HomeClient({ params, dbContent }) {
       services_subtitle: "Integrated Oilfield Solutions Engineered for Results",
       services: [
         {
-          title: "Early Production Facilities",
-          desc: "Turnkey EPF solutions on a lease, operate, and maintain basis — deployed in as little as 15–21 days for oil and 4 months for gas.",
-          img: "/Sigma%20website/Photos/Early%20Production%20Facilities/4.png"
+                "title": "Early Production Facilities",
+                "desc": "Turnkey EPF solutions on a lease, operate, and maintain basis — deployed in as little as 15–21 days for oil and 4 months for gas.",
+                "img": "/Sigma website/Photos/Early Production Facilities/4.png"
         },
         {
-          title: "Gas Treatment Systems",
-          desc: "Fully integrated modular gas treatment plants — from engineering and supply to commissioning and operation. From first gas in 4 months.",
-          img: "/Sigma%20website/Photos/Gas%20Treatment%20Systems/18.png"
+                "title": "Gas Treatment Systems",
+                "desc": "Fully integrated modular gas treatment plants — from engineering and supply to commissioning and operation. From first gas in 4 months.",
+                "img": "/Sigma website/Photos/Gas Treatment Systems/18.png"
         },
         {
-          title: "Well Testing Services",
-          desc: "Premium well testing with 25+ years of experience across Egypt, the Middle East, and Africa — precision data for smarter decisions.",
-          img: "/Sigma%20website/Photos/Wel%20Testing%20Services/1.png"
+                "title": "Well Testing Services",
+                "desc": "Premium well testing with 25+ years of experience across Egypt, the Middle East, and Africa — precision data for smarter decisions.",
+                "img": "/Sigma website/Photos/Wel Testing Services/1.png"
         },
         {
-          title: "Water Treatment & Reinjection",
-          desc: "Transform produced water into a strategic reservoir asset — advanced treatment systems for Enhanced Oil Recovery (EOR).",
-          img: "/Sigma%20website/Photos/Water%20Treatment/45.png"
+                "title": "Water Treatment & Reinjection",
+                "desc": "Transform produced water into a strategic reservoir asset — advanced treatment systems for Enhanced Oil Recovery (EOR).",
+                "img": "/new/3/water tretment.png"
         },
         {
-          title: "Gas Compression Solutions",
-          desc: "Rapid-deployment compression systems with 98%+ operational availability — from 500 HP to 2,000 HP configurations.",
-          img: "/Sigma%20website/Photos/Gas%20Compression/1.png"
+                "title": "Gas Compression Solutions",
+                "desc": "Rapid-deployment compression systems with 98%+ operational availability — from 500 HP to 2,000 HP configurations.",
+                "img": "/new/3/gas compression 1.png"
         },
         {
-          title: "Flared Gas Recovery",
-          desc: "Integrated solutions to minimize routine flaring — turning wasted gas into monetizable production streams.",
-          img: "/Sigma%20website/Photos/Flared%20Gas/98.png"
+                "title": "Flared Gas Recovery",
+                "desc": "Integrated solutions to minimize routine flaring — turning wasted gas into monetizable production streams.",
+                "img": "/new/3/flaerd gas.png"
         },
         {
-          title: "Gas-to-Power Solutions",
-          desc: "Convert associated and flared gas into dependable electrical power — reducing diesel dependency and operating costs.",
-          img: "/Sigma%20website/Photos/Gas%20to%20Power/1.png"
+                "title": "Gas-to-Power Solutions",
+                "desc": "Convert associated and flared gas into dependable electrical power — reducing diesel dependency and operating costs.",
+                "img": "/new/3/gas to power1.png"
         },
         {
-          title: "Flash-By & Pulling Units",
-          desc: "Advanced truck-mounted drilling and workover rigs for fast, safe well intervention in challenging environments.",
-          img: "/Sigma%20website/Photos/Flash%20By%20%26%20Puling%20Unit/1.png"
+                "title": "Zero-Pressure Manifold Solutions",
+                "desc": "Ultra-low-pressure manifolds engineered for safe, efficient multiphase flow distribution and minimized pressure losses.",
+                "img": "/new/3/Zero Pressure Manifold1.png"
         },
         {
-          title: "Metering Systems & Custody Transfer",
-          desc: "Certified accuracy for custody transfer, fiscal measurement, and commercial gas transactions — confidence in every cubic meter.",
-          img: "/Sigma%20website/Photos/Metering%20Systems/1.png"
+                "title": "Flash-By & Pulling Rigs",
+                "desc": "Advanced truck-mounted drilling and workover rigs for fast, safe well intervention in challenging environments.",
+                "img": "/new/3/flash by1.png"
+        },
+        {
+                "title": "Metering Systems & Custody Transfer",
+                "desc": "Certified accuracy for custody transfer, fiscal measurement, and commercial gas transactions — confidence in every cubic meter.",
+                "img": "/new/3/metering1.png"
         }
-      ],
+],
       timeline_title: "Our Milestone Journey",
       timeline_subtitle: "25 Years of Continuous Growth & Expansion",
       timeline_preview_text: "Founded in Egypt in 2001, Sigma has spent 25 years establishing footprints in Oman, Saudi Arabia, Libya, Syria, Morocco, Algeria, and Kenya, while pioneering green technologies like Zero Gas Flaring.",
@@ -496,7 +507,7 @@ export default function HomeClient({ params, dbContent }) {
           title: "Nidoco EPF — Phase I",
           subtitle: "ENI / EGPC | Operator: Petrobel | Engineering: ENPPI",
           tagline: "One of the fastest gas facilities ever built in Egypt",
-          img: "/Sigma%20website/Photos/Early%20Production%20Facilities/3.png",
+          img: "/new/2/nidoco1.png",
           stats: [
             { num: "180", unit: "MMSCFD", label: "Gas Processing" },
             { num: "800", unit: "BBL/day", label: "Condensate" },
@@ -507,7 +518,7 @@ export default function HomeClient({ params, dbContent }) {
           title: "Nidoco EPF — Phase II",
           subtitle: "ENI / EGPC | Operator: Petrobel | Engineering: ENPPI",
           tagline: "Supplies Egypt's largest power generation plant",
-          img: "/Sigma%20website/Photos/Early%20Production%20Facilities/7.png",
+          img: "/new/2/nidoco2.png",
           stats: [
             { num: "360", unit: "MMSCFD", label: "Gas Capacity" },
             { num: "1,600", unit: "BBL/day", label: "Condensate" },
@@ -518,7 +529,7 @@ export default function HomeClient({ params, dbContent }) {
           title: "Gas Production Facility",
           subtitle: "RWE / EGPC | Operator: SUCO",
           tagline: "Reliable mid-scale production with sustained excellence",
-          img: "/Sigma%20website/Photos/Gas%20Treatment%20Systems/5.png",
+          img: "/new/2/3.png",
           stats: [
             { num: "60", unit: "MMSCFD", label: "Gas Processing" },
             { num: "Long-term", unit: "O&M", label: "O&M by Sigma" },
@@ -668,7 +679,7 @@ export default function HomeClient({ params, dbContent }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight max-w-5xl leading-[1.1] text-white drop-shadow-lg"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight max-w-5xl leading-[1.1] text-white drop-shadow-lg whitespace-pre-line"
         >
           {content.hero_title}
         </motion.h1>
@@ -706,7 +717,7 @@ export default function HomeClient({ params, dbContent }) {
             {content.cta_watch_video}
           </Button>
 
-          <a href="/Sigma%20website/Sigma%20Presentation.pdf" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+          <a href="/new/4/Sigma's%20Company%20Profile.pdf" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
             <Button size="lg" variant="outline" className="w-full cursor-pointer h-12 px-8 border-white/20 text-white bg-white/10 hover:bg-white/20 gap-2 transform hover:-translate-y-0.5 transition-all duration-200 rounded-xl">
               <FileText className="h-4 w-4 text-white" />
               {content.cta_profile}
@@ -783,7 +794,7 @@ export default function HomeClient({ params, dbContent }) {
           {/* Left Column: Biography texts */}
           <div className="space-y-6">
             <span className="text-xs font-bold text-primary uppercase tracking-widest">{content.who_we_are_title}</span>
-            <h2 className="text-3xl md:text-5xl font-black text-[#003366] dark:text-white leading-tight">
+            <h2 className="text-3xl md:text-5xl font-black text-[#003366] dark:text-white leading-tight whitespace-pre-line">
               {content.who_we_are_subtitle}
             </h2>
             <div className="space-y-4 text-muted-foreground text-sm md:text-base leading-relaxed font-medium">
@@ -801,8 +812,8 @@ export default function HomeClient({ params, dbContent }) {
               <div className="overflow-hidden rounded-3xl border border-border/30 shadow-md group relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/Sigma%20website/Photos/Early%20Production%20Facilities/3.png"
-                  alt="Early Production Facility 3"
+                  src="/new/1/1.png"
+                  alt="Sigma Facility 1"
                   className="w-full h-48 md:h-64 object-cover group-hover:scale-108 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
@@ -810,8 +821,8 @@ export default function HomeClient({ params, dbContent }) {
               <div className="overflow-hidden rounded-3xl border border-border/30 shadow-md group relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/Sigma%20website/Photos/Early%20Production%20Facilities/7.png"
-                  alt="Early Production Facility 7"
+                  src="/new/1/18.png"
+                  alt="Sigma Facility 18"
                   className="w-full h-32 md:h-44 object-cover group-hover:scale-108 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
@@ -821,8 +832,8 @@ export default function HomeClient({ params, dbContent }) {
               <div className="overflow-hidden rounded-3xl border border-border/30 shadow-md group relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/Sigma%20website/Photos/Early%20Production%20Facilities/4.png"
-                  alt="Early Production Facility 4"
+                  src="/new/1/5.png"
+                  alt="Sigma Facility 5"
                   className="w-full h-32 md:h-44 object-cover group-hover:scale-108 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
@@ -830,8 +841,8 @@ export default function HomeClient({ params, dbContent }) {
               <div className="overflow-hidden rounded-3xl border border-border/30 shadow-md group relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/Sigma%20website/Photos/Early%20Production%20Facilities/17.png"
-                  alt="Early Production Facility 17"
+                  src="/new/1/20.png"
+                  alt="Sigma Facility 20"
                   className="w-full h-48 md:h-64 object-cover group-hover:scale-108 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
@@ -883,12 +894,12 @@ export default function HomeClient({ params, dbContent }) {
           </div>
 
           {/* Timeline Image Container */}
-          <div className="my-10 overflow-hidden rounded-3xl bg-card border border-border/30 p-4 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 max-w-4xl mx-auto">
+          <div className="my-10 overflow-hidden rounded-3xl bg-white border border-border/30 p-4 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 max-w-4xl mx-auto">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/Sigma%20website/time%20line.png"
               alt="Growth Timeline Chart"
-              className="w-full h-auto object-contain rounded-2xl filter dark:brightness-95 dark:contrast-105"
+              className="w-full h-auto object-contain rounded-2xl"
             />
           </div>
 
@@ -1336,6 +1347,39 @@ export default function HomeClient({ params, dbContent }) {
         </div>
       </section>
 
+            {/* 9.5 OUR CLIENTS SECTION */}
+      <section className="py-20 bg-background border-t border-border/30 relative">
+        <div className="container mx-auto max-w-5xl px-6 space-y-12">
+          {/* Header */}
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <span className="text-xs font-bold text-primary uppercase tracking-widest">
+              {isRTL ? "عملائنا" : "OUR CLIENTS"}
+            </span>
+            <h2 className="text-3xl md:text-4xl font-black text-[#003366] dark:text-white leading-tight">
+              {isRTL ? "شركاء النجاح في قطاع الطاقة" : "Our Trusted Energy Partners"}
+            </h2>
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-xl mx-auto font-light">
+              {isRTL 
+                ? "نفخر بخدمة كبار مشغلي النفط والغاز والمشروعات المشتركة والشركات الوطنية."
+                : "Proudly serving leading oil & gas operators, joint ventures, and national energy corporations."}
+            </p>
+          </div>
+
+          {/* Logo List Image Frame */}
+          <div className="bg-card p-6 md:p-8 rounded-[32px] border border-border/30 shadow-xl max-w-4xl mx-auto flex items-center justify-center bg-white dark:bg-zinc-950/20">
+            <div className="relative overflow-hidden rounded-2xl border border-border/10 w-full max-w-3xl mx-auto bg-white p-4 md:p-6 flex items-center justify-center shadow-inner group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src="/Sigma website/Client list logos/Client list logos copy.png" 
+                alt="Sigma Clients List" 
+                className="max-h-[380px] w-full object-contain rounded-xl hover:scale-102 transition-transform duration-500" 
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       {/* 10. CONTACT US FORM SECTION */}
       <section className="py-24 bg-gradient-to-b from-[#002244] to-[#000f22] dark:from-[#080d16] dark:to-[#02050a] text-white border-t border-white/5 relative overflow-hidden">
         {/* Floating background glowing blob */}
@@ -1392,8 +1436,8 @@ export default function HomeClient({ params, dbContent }) {
                   </div>
                   <div className="space-y-0.5">
                     <span className="block font-black text-white text-[10px] uppercase tracking-wider">{isRTL ? "الموقع الإلكتروني" : "Website"}</span>
-                    <a href="https://sigmapetroleumeg.com" target="_blank" rel="noopener noreferrer" className="block text-zinc-300 hover:text-white transition-colors font-medium">
-                      sigmapetroleumeg.com
+                    <a href="https://sigmagroupegypt.com" target="_blank" rel="noopener noreferrer" className="block text-zinc-300 hover:text-white transition-colors font-medium">
+                      sigmagroupegypt.com
                     </a>
                   </div>
                 </div>

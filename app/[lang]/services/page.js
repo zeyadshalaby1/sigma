@@ -61,6 +61,7 @@ export default function ServicesPage() {
                 "desc": "مرافق إنتاج مبكر سريعة التتبع ومرنة لتبدأ التدفقات النقدية والإنتاج بسرعة.",
                 "img": "/Sigma%20website/Photos/Early%20Production%20Facilities/3.png",
                 "img2": "/Sigma%20website/Photos/Early%20Production%20Facilities/17.png",
+                "img3": "/new/5/IMG_1185.PNG",
                 "details": {
                         "headline": "تسريع نجاح حقول النفط الخاصة بك",
                         "content1": "في سيجما للخدمات البترولية، نعيد تعريف حلول مرافق الإنتاج المبكر منذ عام 2001. بصفتنا شريكاً موثوقاً لتقديم أنظمة سريعة التتبع وفعالة من حيث التكلفة، نقدم حلولاً متكاملة لتسليم المفتاح على أساس التأجير والتشغيل والصيانة (Lease, Operate & Maintain) المصممة للمشاريع قصيرة وطويلة الأجل. يتم تخصيص مرافقنا للتعامل مع الخصائص المتغيرة للخام، مما يوفر تثبيتاً سريعاً للنفط وفصلاً كاملاً للمياه وإدارة الغاز، مما يتيح للمشغلين بدء الإنتاج والتحقق من أداء المكمن بأسابيع قبل إنشاء المرافق الدائمة. بدعم من خبرتنا الهندسية، ننشر وحدات قياسية مسبقة الصنع تقلل بشكل كبير من أوقات التشييد في الموقع وتزيد من التدفقات النقدية بكفاءة وأمان تامين.",
@@ -90,8 +91,9 @@ export default function ServicesPage() {
                 "id": "gas-treatment",
                 "title": "أنظمة معالجة الغاز",
                 "desc": "معالجة تدفقات الغاز بكفاءة عالية لتلبية أصعب شروط الجودة والمواصفات.",
-                "img": "/Sigma%20website/Photos/Gas%20Treatment%20Systems/3.png",
-                "img2": "/Sigma%20website/Photos/Gas%20Treatment%20Systems/18.png",
+                "img": "/new/5/IMG_1170.PNG",
+                "img2": "/new/5/IMG_1171.PNG",
+                "img3": "/new/5/IMG_1179.PNG",
                 "details": {
                         "headline": "غاز بمواصفات مطابقة للشروط في الوقت المحدد",
                         "content1": "تتمتع سيجما بخبرة واسعة في التنفيذ الكامل لمحطات معالجة وتجفيف وتحلية الغاز المعيارية. بدءاً من التصاميم الهندسية الأساسية (FEED) والتوريد إلى التركيب في الموقع والتشغيل والصيانة لحقول النفط والغاز، تم تصميم حلولنا هندسياً لمعالجة غاز الضغط العالي، التراكيب المتغيرة، والمحتويات العالية من كبريتيد الهيدروجين وثاني أكسيد الكربون. نحن نستخدم أنظمة معالجة متقدمة بالأمين والتجفيف بالجليكول لضمان مطابقة الغاز الناتج للمواصفات التجارية وخطوط الأنابيب أو محطات الطاقة، مع تصاميم قياسية تقلل الأعمال المدنية وتسهل الانتشار والنقل السريع.",
@@ -152,8 +154,8 @@ export default function ServicesPage() {
                 "id": "water-treatment",
                 "title": "معالجة المياه وإعادة حقنها",
                 "desc": "إدارة مستدامة لمياه حقول النفط وحماية المكامن وتعزيز استخلاص الطاقة.",
-                "img": "/new/3/water%20tretment.png",
-                "img2": "/new/3/water%20tretment2.png",
+                "img": "/new/5/IMG_1180.PNG",
+                "img2": "/new/3/watertretment1.png",
                 "details": {
                         "headline": "تحويل مياه الصرف النفطي إلى أصل استراتيجي",
                         "content1": "تقوم سيجما بتحويل المياه المصاحبة للإنتاج من مجرى نفايات تشغيلي صعب إلى أصل استراتيجي هام للحقول. تستخدم حزم المعالجة المتقدمة لدينا تقنيات الهيدروسيكلون، وتعويم الغاز المذاب (DGF)، والترشيح لإزالة قطرات النفط والمواد الصلبة العالقة والمكونات العضوية. يتم تحضير المياه المعالجة لتكون مثالية لإعادة حقنها بهدف الحفاظ على ضغط المكمن وتحسين استخلاص النفط (EOR)، أو للتخلص الآمن منها بيئياً، مما يقلل بشكل كبير من تكاليف نقل النفايات ويعزز الاستدامة البيئية للعمليات.",
@@ -215,7 +217,7 @@ export default function ServicesPage() {
                 "title": "استعادة الغاز المحروق",
                 "desc": "الحد من الانبعاثات وتحويل الغاز المشتعل المهدر إلى موارد طاقة منتجة.",
                 "img": "/new/3/flaerd%20gas.png",
-                "img2": "/new/3/flaerd%20gas2.png",
+                "img2": "/new/3/flares%20gas%202.png",
                 "details": {
                         "headline": "مبادرات التخلص من حرق الغاز صفر (Zero Flaring)",
                         "content1": "تساعد مبادرات سيجما للتخلص من حرق الغاز (Zero-flare) المشغلين على تقليل انبعاثات الاحتباس الحراري بشكل كبير مع استعادة طاقة قيمة. نقوم بهندسة وتشغيل وحدات استعادة غاز الشعلة المتكاملة (FGRU) التي تلتقط الغاز المصاحب ذي الضغط المنخفض. يتم تنقية وضغط الغاز المستعاد في الموقع، مما يحول مصدراً للتلوث البيئي إلى وقود صالح لمولدات الطاقة المحلية أو للتغذية في محطات المعالجة، مما يحقّق عائدات مالية إضافية للعملاء ويدعم معايير الاستدامة البيئية.",
@@ -377,6 +379,7 @@ export default function ServicesPage() {
                 "desc": "Fast-track and cost-effective modular processing facilities to accelerate first production and verify reservoir potential.",
                 "img": "/Sigma%20website/Photos/Early%20Production%20Facilities/3.png",
                 "img2": "/Sigma%20website/Photos/Early%20Production%20Facilities/17.png",
+                "img3": "/new/5/IMG_1185.PNG",
                 "details": {
                         "headline": "Accelerate Your Oilfield Success",
                         "content1": "At Sigma Petroleum Services, we redefine production facility solutions since 2001. As a trusted partner for fast-track, cost-effective oil and gas processing systems, we offer comprehensive turnkey solutions on a Lease, Operate & Maintain (LOM) basis designed for both short and long-term projects. Our facilities are customized to handle varying crude characteristics, offering rapid crude stabilization, water separation, and gas management, allowing operators to start production and verify reservoir performance weeks ahead of permanent facility construction. Supported by our engineering expertise, we deploy pre-engineered modular units that dramatically cut down site construction times, optimize cash flows, and manage early stage reservoir uncertainties safely and efficiently.",
@@ -406,8 +409,9 @@ export default function ServicesPage() {
                 "id": "gas-treatment",
                 "title": "Gas Treatment Systems",
                 "desc": "Modular gas sweetening and conditioning packages built to meet commercial standards and strict pipeline specifications.",
-                "img": "/Sigma%20website/Photos/Gas%20Treatment%20Systems/3.png",
-                "img2": "/Sigma%20website/Photos/Gas%20Treatment%20Systems/18.png",
+                "img": "/new/5/IMG_1170.PNG",
+                "img2": "/new/5/IMG_1171.PNG",
+                "img3": "/new/5/IMG_1179.PNG",
                 "details": {
                         "headline": "On-Spec Gas Delivered On Time",
                         "content1": "SIGMA has extensive experience in the complete execution of modular gas sweetening, dehydration, and conditioning plants. From front-end engineering design (FEED) and procurement to site installation, commissioning, and operations, our solutions are engineered to handle high H2S and CO2 concentrations, variable inlet pressures, and heavy hydrocarbons. We use advanced amine sweetening, glycol dehydration (TEG), and molecular sieve systems to ensure product gas strictly meets commercial sales specs, pipeline standards, or power plant requirements. Our modular skid designs are highly responsive to swift installation, minimize civil works, and can be scaled incrementally as production demands evolve.",
@@ -468,8 +472,8 @@ export default function ServicesPage() {
                 "id": "water-treatment",
                 "title": "Produced Water Treatment",
                 "desc": "Advanced treatment systems to manage produced water, protect reservoirs, and boost pressure injection.",
-                "img": "/new/3/water%20tretment.png",
-                "img2": "/new/3/water%20tretment2.png",
+                "img": "/new/5/IMG_1180.PNG",
+                "img2": "/new/3/watertretment1.png",
                 "details": {
                         "headline": "Turning Operational Waste into a Strategic Asset",
                         "content1": "SIGMA transforms produced water from a challenging operational waste stream into a strategic asset. Our advanced multi-stage treatment packages utilize hydrocyclones, dissolved gas flotation (DGF), media filtration, and chemical dosing to remove oil-in-water, suspended solids, and dissolved organics. The treated water is rendered perfect for reservoir pressure maintenance, enhanced oil recovery (EOR) reinjection, or safe environmental disposal in compliance with stringent environmental regulations. By treating produced water on-site, we help operators significantly reduce disposal transportation costs, minimize environmental footprint, and enhance the overall sustainability of field operations.",
@@ -531,7 +535,7 @@ export default function ServicesPage() {
                 "title": "Flared Gas Recovery",
                 "desc": "Mitigating emission footprints by capturing flare gas and conditioning it into productive fuel assets.",
                 "img": "/new/3/flaerd%20gas.png",
-                "img2": "/new/3/flaerd%20gas2.png",
+                "img2": "/new/3/flares%20gas%202.png",
                 "details": {
                         "headline": "Pioneering Zero Gas Flaring Initiatives",
                         "content1": "SIGMA's zero-flare initiatives help operators dramatically reduce greenhouse gas emissions while capturing valuable energy. We engineer and operate complete flare gas recovery units (FGRU) that capture low-pressure associated gas that would otherwise be flared. The captured gas is scrubbed, compressed, and conditioned on-site, converting an environmental hazard into usable fuel gas for local power generators, raw gas feed for sweetening plants, or pipeline-quality sales gas. Our integrated approach helps energy companies comply with national environmental mandates and ESG targets while generating new revenue streams from wasted assets.",
@@ -739,7 +743,12 @@ export default function ServicesPage() {
           <div className="lg:col-span-2">
             <Card className="border-border/30 shadow-xl overflow-hidden rounded-[32px] bg-card">
               {/* Cover Image of active service */}
-              <div className="relative h-60 md:h-80 w-full overflow-hidden bg-muted group">
+              <a 
+                href={services[activeTab].img} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="relative h-60 md:h-80 w-full overflow-hidden bg-muted group block"
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
                   src={services[activeTab].img} 
@@ -750,7 +759,7 @@ export default function ServicesPage() {
                 <span className="absolute bottom-4 start-4 text-[9px] font-black text-white bg-primary px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm select-none">
                   {isRTL ? "تشغيل معتمد" : "OPERATIONAL FIELD RECORD"}
                 </span>
-              </div>
+              </a>
 
               <CardHeader className="border-b border-border/20 bg-muted/30 p-6 md:p-8">
                 <div className="flex items-center gap-3.5 mb-2">
@@ -806,19 +815,44 @@ export default function ServicesPage() {
                   </div>
 
                   {/* Right Image Panel */}
-                  {services[activeTab].img2 && (
+                  {(services[activeTab].img2 || services[activeTab].img3) && (
                     <div className="md:col-span-5 space-y-4">
-                      <div className="relative rounded-2xl overflow-hidden border border-border/20 bg-muted aspect-[4/3] md:aspect-square shadow-md group">
-                        <img 
-                          src={services[activeTab].img2} 
-                          alt={`${services[activeTab].title} detail`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
-                        <span className="absolute bottom-3 start-3 text-[8px] font-bold text-white bg-[#003366]/90 backdrop-blur-sm px-2.5 py-1 rounded-full uppercase tracking-wider">
-                          {isRTL ? "معاينة حقلية" : "FIELD OVERVIEW"}
-                        </span>
-                      </div>
+                      {services[activeTab].img2 && (
+                        <a 
+                          href={services[activeTab].img2} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="relative rounded-2xl overflow-hidden border border-border/20 bg-muted aspect-[4/3] md:aspect-square shadow-md group block"
+                        >
+                          <img 
+                            src={services[activeTab].img2} 
+                            alt={`${services[activeTab].title} detail`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                          <span className="absolute bottom-3 start-3 text-[8px] font-bold text-white bg-[#003366]/90 backdrop-blur-sm px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            {isRTL ? "معاينة حقلية" : "FIELD OVERVIEW"}
+                          </span>
+                        </a>
+                      )}
+                      {services[activeTab].img3 && (
+                        <a 
+                          href={services[activeTab].img3} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="relative rounded-2xl overflow-hidden border border-border/20 bg-muted aspect-[4/3] md:aspect-square shadow-md group block"
+                        >
+                          <img 
+                            src={services[activeTab].img3} 
+                            alt={`${services[activeTab].title} detail extra`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                          <span className="absolute bottom-3 start-3 text-[8px] font-bold text-white bg-[#003366]/90 backdrop-blur-sm px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            {isRTL ? "معاينة إضافية" : "ADDITIONAL VIEW"}
+                          </span>
+                        </a>
+                      )}
                     </div>
                   )}
                 </div>

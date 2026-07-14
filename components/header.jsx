@@ -52,7 +52,8 @@ export function Header({ lang, dict }) {
     { href: `/${lang}/about`, label: lang === "ar" ? "من نحن" : "Who We Are" },
     { href: `/${lang}/services`, label: dict?.nav?.services || (lang === "ar" ? "خدماتنا" : "Services") },
     { href: `/${lang}/timeline`, label: lang === "ar" ? "مسيرتنا" : "Timeline" },
-    { href: `/${lang}/marine-supply`, label: lang === "ar" ? "التوريدات والبحرية" : "Supply & Marine" },
+    { href: `/${lang}/supply`, label: lang === "ar" ? "التوريدات" : "Supply" },
+    { href: `/${lang}/marine`, label: lang === "ar" ? "البحرية" : "Marine" },
     { href: `/${lang}/blog`, label: lang === "ar" ? "المدونة" : "Blog" },
     { href: `/${lang}/contact`, label: dict?.nav?.contact || (lang === "ar" ? "تواصل معنا" : "Contact") },
   ];

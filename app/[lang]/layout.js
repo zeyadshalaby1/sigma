@@ -59,7 +59,7 @@ export async function generateMetadata({ params }) {
   return {
     title: {
       default: dict.metadata.title,
-      template: `%s | Sigma Petroleum Services`,
+      template: `%s | Sigma Group Egypt | Sigma Petroleum Services`,
     },
     description: dict.metadata.description,
     keywords: dict.metadata.keywords,
@@ -133,7 +133,14 @@ function OrganizationSchema({ lang, dict, baseUrl, socialLinks }) {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Sigma Petroleum Services",
-    alternateName: "سيجما للخدمات البترولية",
+    alternateName: [
+      "Sigma Group",
+      "Sigma Group Egypt",
+      "سيجما للخدمات البترولية",
+      "سيجما جروب",
+      "سيجما جروب مصر",
+      "Sigma Petroleum",
+    ],
     url: baseUrl,
     logo: `${baseUrl}/Sigma website/Sigma Logo/Orignal Logo.png`,
     description: dict.seo?.schema_description || dict.metadata.description,

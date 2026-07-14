@@ -841,7 +841,7 @@ export default function HomeClient({ params, dbContent }) {
               <div className="overflow-hidden rounded-3xl border border-border/30 shadow-md group relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/new/1/20.png"
+                  src="/new/5/IMG_1180.PNG"
                   alt="Sigma Facility 20"
                   className="w-full h-48 md:h-64 object-cover group-hover:scale-108 transition-transform duration-700"
                 />

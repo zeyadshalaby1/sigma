@@ -116,7 +116,7 @@ export default function AboutPage() {
               <div className="relative h-32 overflow-hidden rounded-3xl border border-border/30 bg-muted shadow-sm group">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
-                  src="/Sigma%20website/Photos/General/2.png" 
+                  src="/new/5/IMG_1189.PNG" 
                   alt="Sigma Facility" 
                   className="w-full h-full object-cover hover:scale-108 transition-transform duration-700" 
                 />
@@ -127,7 +127,7 @@ export default function AboutPage() {
               <div className="relative h-32 overflow-hidden rounded-3xl border border-border/30 bg-muted shadow-sm group">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
-                  src="/Sigma%20website/Photos/General/3.png" 
+                  src="/new/5/IMG_1189.PNG" 
                   alt="Sigma Team" 
                   className="w-full h-full object-cover hover:scale-108 transition-transform duration-700" 
                 />
